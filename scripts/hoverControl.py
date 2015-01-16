@@ -47,7 +47,12 @@ def createSquare():
     intonaData = getIntonaData()
     if intonaData['jab']:
         sq = scene.addObject("CubePartHandle", "hoverBoard")
-        sq.worldPosition = [(random()*10)-5, (random()*10)-5, random()*4]
+        accelx = intonaData['accel_x']*0.01
+        accely = intonaData['accel_y']*0.01
+        accelz = intonaData['accel_z']* 0.01
+        sq.children[0].localPosition = [ accelx, accely, accelz]
+        sq.localAngularVelocity = [accelx, accely, accelz]
+        #sq.worldPosition = [ accelx, accely, accelz]
         squares.append(sq)
         
 
