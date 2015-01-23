@@ -1,5 +1,6 @@
 import math
 from bge import logic
+from mathutils import Vector
 from random import random
 
 cont = logic.getCurrentController()
@@ -45,14 +46,48 @@ def getAmplitudes():
 def createSquare():
     #global squares
     intonaData = getIntonaData()
-    if intonaData['jab']:
-        sq = scene.addObject("CubePartHandle", "hoverBoard")
-        accelx = intonaData['accel_x']*0.01
-        accely = intonaData['accel_y']*0.01
-        accelz = intonaData['accel_z']* 0.01
-        sq.children[0].localPosition = [ accelx, accely, accelz]
-        sq.localAngularVelocity = [accelx, accely, accelz]
-        #sq.worldPosition = [ accelx, accely, accelz]
-        squares.append(sq)
+    if isSensorPositive():
+        if intonaData['jab']:
+            sq = scene.addObject("CubePartHandle", "hoverBoard")
+            accelx = intonaData['accel_x']*0.01
+            accely = intonaData['accel_y']*0.01
+            accelz = intonaData['accel_z']* 0.01
+            sq.children[0].localPosition = [ accelx, accely, accelz]
+            sq.localAngularVelocity = [accelx, accely, accelz]
+            sq.worldPosition = [ accelx, accely, accelz]
+            squares.append(sq)
         
+def hoverBoardRay():
+    updateContext()
+    ray = cont.sensors["Ray"]
+    pointingAt = ray.hitObject
+    hitpos = ray.hitPosition
+    hitVector = Vector(hitpos)
+    screenPosition = pointingAt.worldTransform
+    screenInverted = screenPosition.inverted()
+    screenPosition = screenInverted * hitVector
+    print("hover poining at {} {}".format(pointingAt, screenPosition))
+    # if ray.hitObject is not None:
+    #     pointingAt = ray.hitObject
+    #     print("hit: {} at {}".format(pointingAt, ray.hitPosition))
+    #     hitVector = Vector(ray.hitPosition)
+    #     screenPosition = pointingAt.worldTransform
+    #     screenInverted = screenPosition.inverted()
+    #     screenPosition = screenInverted * hitVector
+    #     print(screenPosition)
+    # else:
+    #     pointingAt= None
 
+def updateContext():
+    global cont, obj, scene
+    cont = logic.getCurrentController()
+    obj = cont.owner
+    scene = logic.getCurrentScene()  
+
+def isSensorPositive():
+    from bge import logic
+    cont = logic.getCurrentController()
+    for sensor in cont.sensors:
+        if sensor.positive:
+            return True
+    return False
