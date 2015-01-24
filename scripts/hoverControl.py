@@ -1,16 +1,36 @@
 import math
+import os
+import sys
+
 from bge import logic
 from mathutils import Color
 from mathutils import Vector
 from random import random
+from random import randint
+
+CURDIR = logic.expandPath('//')
+SCRIPTS_PATH = os.path.join(CURDIR, 'scripts')
+sys.path.append(SCRIPTS_PATH)
+
+#print(os.path.join(logic.expandPath('//'), 'scripts'))
+from mediator import Mediator
 
 cont = logic.getCurrentController()
 scene = logic.getCurrentScene()
 
+ALPHA = 1.0
+
+colors = [
+    [0.443, 0.616, 0.635, ALPHA],
+    [1.0, 0.949, 0.694, ALPHA],
+    [0.71, 0.302, 0.325, ALPHA],
+    [0.533, 0.463, 0.11, ALPHA],
+]
 previousData = {}
 amplitudes = {}
 
 squares = []
+
 
 def getIntonaData():
     return logic.globalDict['intonaData']
@@ -70,11 +90,13 @@ def createSquare():
             squares.append(sq)
 
 def createSquares():
+    dummy = scene.objects["Plane.001"]
+    dummy.playAction("PipeLvalveH", 0 , 250)
     for i in range(100):
         sq = sq = scene.addObject("CubePart", "hoverBoard")
         sq.worldPosition = [(random() * 100) - 50, (random() * 100) + 50 , (random() * 0.01) - 3]
         sq.worldScale = [(random() * 10), (random() * 10) , (random() * 10)]
-        sq.color = [0.2 + (random() * 0.001), 0.6 + (random() * 0.001), 0.8 + (random() * 0.01), 0.8 + (random() * 0.1)]
+        sq.color = colors[randint(0,3)]
 
 def hoverBoardRay():
     updateContext()
@@ -118,3 +140,8 @@ def isSensorPositive():
         if sensor.positive:
             return True
     return False
+
+def createMediator():
+    if isSensorPositive():
+        med = Mediator(scene.addObject("Mediator", "Floor"))
+        print(med.name)
