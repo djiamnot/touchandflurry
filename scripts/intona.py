@@ -40,7 +40,9 @@ def jabDetect():
     """
     intonaData = logic.globalDict['intonaData']
     accelSum = abs(intonaData['accel_x']) + abs(intonaData['accel_y']) + abs(intonaData['accel_z'])
-    if accelSum > 700:
+    if accelSum > 500:
         logic.globalDict['intonaData']["jab"] = True
     else:
         logic.globalDict['intonaData']["jab"] = False
+        
+
