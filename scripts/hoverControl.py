@@ -1,5 +1,6 @@
 import math
 from bge import logic
+from mathutils import Color
 from mathutils import Vector
 from random import random
 
@@ -31,6 +32,17 @@ def rotateHoverBoard():
     #accelz.worldScale = [(az[0]+intonaData['accel_z'])*0.01, az[1], az[2]]
     #floor.worldOrientation = [math.radians(intonaData['magnetom_x']), math.radians(intonaData['magnetom_y']), math.radians(intonaData['magnetom_z'])]
     #accelx.worldOrientation = [math.radians(intonaData['accel_x']), math.radians(intonaData['accel_y']), -math.radians(intonaData['accel_z'])]
+
+def intonaForce():
+    intonaData = getIntonaData()
+    force = scene.objects['Forceer']
+    accelx = intonaData['accel_x'] * 0.1
+    accely = intonaData['accel_y'] * 0.1
+    accelz = intonaData['accel_z'] * 0.1
+    if isSensorPositive():
+        if intonaData['jab']:
+            print("jab", [accelx, accely, accelz])
+            force.worldLinearVelocity = [accelx, accely, accelz]
         
 def getAmplitudes():
     global previousData, amplitudes
@@ -56,17 +68,24 @@ def createSquare():
             sq.localAngularVelocity = [accelx, accely, accelz]
             sq.worldPosition = [ accelx, accely, accelz]
             squares.append(sq)
-        
+
+def createSquares():
+    for i in range(100):
+        sq = sq = scene.addObject("CubePart", "hoverBoard")
+        sq.worldPosition = [(random() * 100) - 50, (random() * 100) + 50 , (random() * 0.01) - 3]
+        sq.worldScale = [(random() * 10), (random() * 10) , (random() * 10)]
+        sq.color = [0.2 + (random() * 0.001), 0.6 + (random() * 0.001), 0.8 + (random() * 0.01), 0.8 + (random() * 0.1)]
+
 def hoverBoardRay():
     updateContext()
-    ray = cont.sensors["Ray"]
-    pointingAt = ray.hitObject
-    hitpos = ray.hitPosition
-    hitVector = Vector(hitpos)
-    screenPosition = pointingAt.worldTransform
-    screenInverted = screenPosition.inverted()
-    screenPosition = screenInverted * hitVector
-    print("hover poining at {} {}".format(pointingAt, screenPosition))
+    # ray = cont.sensors["Ray"]
+    # pointingAt = ray.hitObject
+    # hitpos = ray.hitPosition
+    # hitVector = Vector(hitpos)
+    # screenPosition = pointingAt.worldTransform
+    # screenInverted = screenPosition.inverted()
+    # screenPosition = screenInverted * hitVector
+    # print("hover poining at {} {}".format(pointingAt, screenPosition))
     # if ray.hitObject is not None:
     #     pointingAt = ray.hitObject
     #     print("hit: {} at {}".format(pointingAt, ray.hitPosition))
@@ -77,6 +96,14 @@ def hoverBoardRay():
     #     print(screenPosition)
     # else:
     #     pointingAt= None
+    PipeRay = cont.sensors["PipeLValve"]
+    pointingAt = PipeRay.hitObject
+    hitpos = PipeRay.hitPosition
+    hitVector = Vector(hitpos)
+    screenPosition = pointingAt.worldTransform
+    screenInverted = screenPosition.inverted()
+    screenPosition = screenInverted * hitVector
+    print("PipeLvalve poining at {} {}".format(pointingAt, screenPosition))
 
 def updateContext():
     global cont, obj, scene
