@@ -1,0 +1,44 @@
+* Touch & Flurry
+** Program note
+
+#+begin_verse
+
+orbiting comet
+simmers frosty dust
+
+a fingertip
+brushes bare skin
+
+spreads
+down the path
+a morning dew
+#+end_verse
+
+-----
+
+#+begin_verse
+
+Comète en orbite
+Bouillon de poussière glaciale
+
+Du bout des doigts
+Effleure l’épiderme
+
+Étale
+Sur son chemin
+La rosée
+
+#+end_verse
+
+** Performance description
+
+   Touch & Flurry is a comprovisation for a pair of robotic instruments by Productions Totem Contemporain called /The Pipe/ [fn:1]. The instruments are played by an innovative controller called /Intonaspacio/ [[fig:Intonaspacio-controller][Fig. 1]] designed by Mailis Rodrigues[fn:2].
+
+
+* Footnotes
+
+[fn:1] http://totemcontemporain.com/totem-instrument/the-pipe/
+
+[fn:2] Video demonstration: http://vimeo.com/95500863, description: http://www.idmil.org/projects/intonaspacio
+
+
