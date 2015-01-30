@@ -1,7 +1,7 @@
 from serial import Serial
 from bge import logic
 
-s = Serial('/dev/ttyUSB1', '57600', timeout=2)
+s = Serial('/dev/ttyUSB2', '57600', timeout=2)
 #s.open()
 
 intonaData = {}
