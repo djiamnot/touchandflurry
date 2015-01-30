@@ -13,6 +13,7 @@ SCRIPTS_PATH = os.path.join(CURDIR, 'scripts')
 sys.path.append(SCRIPTS_PATH)
 
 #print(os.path.join(logic.expandPath('//'), 'scripts'))
+import config
 from mediator import Mediator
 
 cont = logic.getCurrentController()
@@ -63,6 +64,12 @@ def intonaForce():
         if intonaData['jab']:
             print("jab", [accelx, accely, accelz])
             force.worldLinearVelocity = [accelx, accely, accelz]
+
+def randomForceMove():
+    updateContext()
+    if isSensorPositive():
+        force = scene.objects['Forceer']
+        force.worldLinearVelocity = [(random()*1000) - 500, (random()*1000) - 500, (random()*1000)]
         
 def getAmplitudes():
     global previousData, amplitudes
@@ -91,7 +98,7 @@ def createSquare():
 
 def createSquares():
     dummy = scene.objects["Plane.001"]
-    dummy.playAction("PipeLvalveH", 0 , 250)
+    # dummy.playAction("PipeLvalveH", 0 , 250)
     for i in range(100):
         sq = sq = scene.addObject("CubePart", "hoverBoard")
         sq.worldPosition = [(random() * 100) - 50, (random() * 100) + 50 , (random() * 0.01) - 3]
@@ -141,7 +148,29 @@ def isSensorPositive():
             return True
     return False
 
+valves = []
+
 def createMediator():
     if isSensorPositive():
-        med = Mediator(scene.addObject("Mediator", "Floor"))
-        print(med.name)
+        updateContext()
+        for valve in config.valves:
+            print(" ** Creating ", valve)
+            med = Mediator(scene.addObject("valveController", "Floor"))
+            med.oscurl = valve
+            med.suspendDynamics()
+            # med.worldPosition = [(random() * 10) -5, (random() * 5) + 5, 1]
+            med.worldPosition.x = (random() * 20) -10
+            med.worldPosition.y = (random() * 20) -10
+            med.localScale = [0.7, 0.7, 0.7 + (random() * 3)]
+            valves.append(med)
+
+def playRandomAction():
+    chance = randint(0, len(valves))
+    picked = valves[chance]
+    if not picked.isPlayingAction():
+        picked.playAction("PipeLvalveH", randint(0,100), randint(150, 250), speed=(random()*10))
+
+def updatePositions():
+    global valves
+    for mediator in valves:
+        mediator.sendPosition()
