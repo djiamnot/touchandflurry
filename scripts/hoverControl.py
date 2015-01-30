@@ -164,6 +164,22 @@ def createMediator():
             med.localScale = [0.7, 0.7, 0.7 + (random() * 3)]
             valves.append(med)
 
+def createAll():
+    name = None
+    control = None
+    oscurl = None
+    if isSensorPositive():
+        updateContext()
+        for group in config.groups:
+            for instrument in group['instruments']:
+                name = instrument
+                for control in group['controls']:
+                    control = control
+                    oscurl = os.path.join("/", name, control)
+                    print(oscurl)
+                    
+            
+            
 def playRandomAction():
     chance = randint(0, len(valves))
     picked = valves[chance]
