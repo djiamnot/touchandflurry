@@ -32,6 +32,16 @@ amplitudes = {}
 
 squares = []
 
+camera = 0
+
+def toggleCam():
+    global camera, scene
+    if isSensorPositive():
+        camera = not camera
+        if camera:
+            scene.active_camera = "CamOrtho"
+        else:
+            scene.active_camera = "CamPers"
 
 def getIntonaData():
     return logic.globalDict['intonaData']
@@ -69,7 +79,7 @@ def randomForceMove():
     updateContext()
     if isSensorPositive():
         force = scene.objects['Forceer']
-        force.worldLinearVelocity = [(random()*1000) - 500, (random()*1000) - 500, (random()*1000)]
+        force.worldLinearVelocity = [(random()*1000) - 500, (random()*1000) - 500, (random()*1000) - 500]
         
 def getAmplitudes():
     global previousData, amplitudes
@@ -101,7 +111,7 @@ def createSquares():
     # dummy.playAction("PipeLvalveH", 0 , 250)
     for i in range(100):
         sq = sq = scene.addObject("CubePart", "hoverBoard")
-        sq.worldPosition = [(random() * 100) - 50, (random() * 100) + 50 , (random() * 0.01) - 3]
+        sq.worldPosition = [(random() * 100) - 50, (random() * 100) + 20 , (random() * 0.01) - 1]
         sq.worldScale = [(random() * 10), (random() * 10) , (random() * 10)]
         sq.color = colors[randint(0,3)]
 
@@ -148,7 +158,7 @@ def isSensorPositive():
             return True
     return False
 
-valves = []
+controls = []
 
 def createMediator():
     if isSensorPositive():
@@ -165,9 +175,11 @@ def createMediator():
             valves.append(med)
 
 def createAll():
+    global valves
     name = None
     control = None
     oscurl = None
+    ctrl = None
     if isSensorPositive():
         updateContext()
         for group in config.groups:
@@ -177,16 +189,51 @@ def createAll():
                     control = control
                     oscurl = os.path.join("/", name, control)
                     print(oscurl)
+                    if "valve" in name:
+                        ctrl = "valveController"
+                    elif "speed" in name:
+                        ctrl = "speedController"
+                    else:
+                        ctrl = "otherController"
+                    med = Mediator(scene.addObject(ctrl, "Floor"))
+                    med.oscurl = oscurl
+                    med.id = name
+                    med.control = control
+                    med.suspendDynamics()
+                    # med.worldPosition = [(random() * 10) -5, (random() * 5) + 5, 1]
+                    med.worldPosition.x = (random() * 20) -10
+                    med.worldPosition.y = (random() * 20) -10
+                    stackInstruments(med)
+                    med.localScale = [0.6, 0.6, 0.3 + (random())]
+                    controls.append(med)
                     
+def stackInstruments(instrument):
+    if "Pipe" in instrument.id:
+        print("Found pipe!")
+        instrument.worldPosition.z = 1
+    elif "/" in instrument.id:
+        print("Found Tele!")
+        instrument.worldPosition.z = 2.5
+    else:
+        print("Found choir!")
+        instrument.worldPosition.z = 3.5
             
-            
+        
 def playRandomAction():
-    chance = randint(0, len(valves))
-    picked = valves[chance]
+    chance = randint(0, len(controls))
+    picked = controls[chance]
     if not picked.isPlayingAction():
         picked.playAction("PipeLvalveH", randint(0,100), randint(150, 250), speed=(random()*10))
 
 def updatePositions():
     global valves
-    for mediator in valves:
+    for mediator in controls:
         mediator.sendPosition()
+    if len(controls) > 0:
+        for i in controls:
+            distance = i.getDistanceTo(scene.objects['Forceer'])
+            if distance  < 2:
+                print("{} is at {} from Forceer".format(i, distance))
+                i.restoreDynamics()
+            else:
+                i.suspendDynamics()

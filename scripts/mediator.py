@@ -11,6 +11,8 @@ class Mediator(bge.types.KX_GameObject):
         self.curScene = None
         self.tagetPosition = None
         self.oscurl = None
+        self.id = None
+        self.control = None
 
     def updateContext(self):
         self.cont = bge.logic.getCurrentController()
