@@ -67,13 +67,16 @@ def rotateHoverBoard():
 def intonaForce():
     intonaData = getIntonaData()
     force = scene.objects['Forceer']
-    accelx = intonaData['accel_x'] * 0.1
-    accely = intonaData['accel_y'] * 0.1
-    accelz = intonaData['accel_z'] * 0.1
+    # accelx = intonaData['accel_x'] * 0.1
+    # accely = intonaData['accel_y'] * 0.1
+    # accelz = intonaData['accel_z'] * 0.1
+    # if isSensorPositive():
+    #     if intonaData['jab']:
+    #         print("jab", [accelx, accely, accelz])
+    #         force.worldLinearVelocity = [accelx, accely, accelz]
     if isSensorPositive():
-        if intonaData['jab']:
-            print("jab", [accelx, accely, accelz])
-            force.worldLinearVelocity = [accelx, accely, accelz]
+        force.worldOrientation =  [math.radians(intonaData['roll']), math.radians(intonaData['pitch']), math.radians(intonaData['yaw'])]
+    
 
 def randomForceMove():
     updateContext()
@@ -189,17 +192,20 @@ def createAll():
                     control = control
                     oscurl = os.path.join("/", name, control)
                     print(oscurl)
-                    if "valve" in name:
+                    if "valve" in control:
+                        print("creating valve ", control)
                         ctrl = "valveController"
-                    elif "speed" in name:
+                    elif "speed" in control:
+                        print("creating speed ", control)
                         ctrl = "speedController"
                     else:
+                        print("creating controller ", control)
                         ctrl = "otherController"
                     med = Mediator(scene.addObject(ctrl, "Floor"))
                     med.oscurl = oscurl
                     med.id = name
                     med.control = control
-                    med.suspendDynamics()
+                    med.stopDynamics()
                     # med.worldPosition = [(random() * 10) -5, (random() * 5) + 5, 1]
                     med.worldPosition.x = (random() * 20) -10
                     med.worldPosition.y = (random() * 20) -10
@@ -232,8 +238,8 @@ def updatePositions():
     if len(controls) > 0:
         for i in controls:
             distance = i.getDistanceTo(scene.objects['Forceer'])
-            if distance  < 2:
+            if distance  < 3:
                 print("{} is at {} from Forceer".format(i, distance))
-                i.restoreDynamics()
+                i.startDynamics()
             else:
-                i.suspendDynamics()
+                i.stopDynamics()
