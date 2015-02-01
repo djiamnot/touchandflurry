@@ -34,6 +34,8 @@ squares = []
 
 camera = 0
 
+controls = []
+
 def toggleCam():
     global camera, scene
     if isSensorPositive():
@@ -75,15 +77,36 @@ def intonaForce():
     #         print("jab", [accelx, accely, accelz])
     #         force.worldLinearVelocity = [accelx, accely, accelz]
     if isSensorPositive():
-        force.worldOrientation =  [math.radians(intonaData['roll']), math.radians(intonaData['pitch']), math.radians(intonaData['yaw'])]
-    
+        force.worldOrientation =  [
+            math.radians(intonaData['roll']), 
+            math.radians(intonaData['pitch']), 
+            math.radians(intonaData['yaw'])
+        ]
 
 def randomForceMove():
+    family = []
     updateContext()
     if isSensorPositive():
-        force = scene.objects['Forceer']
-        force.worldLinearVelocity = [(random()*1000) - 500, (random()*1000) - 500, (random()*1000) - 500]
-        
+        # force = scene.objects['Forceer']
+        # force.worldLinearVelocity = [(random()*1000) - 500, (random()*1000) - 500, (random()*1000) - 500]
+        if len(controls) > 0:
+            for c in controls:
+                c.removeParent()
+                c.isDynamic = False
+            for c in controls:
+                if 'Pipe' in c.group:
+                    print("#########", c.group)
+                    family.append(c)
+            print("************************", family)
+            choices = randint(0, len(family))
+            # for i in range(choices):
+            #     control = randint(0, choices) 
+            #     family[control].setParent("Forceer")
+            #     family[control].isDynamic = True
+            for f in family:
+                f.setParent("Forceer")
+                f.isDynamic = True
+
 def getAmplitudes():
     global previousData, amplitudes
     currentData = getIntonaData()
@@ -161,7 +184,6 @@ def isSensorPositive():
             return True
     return False
 
-controls = []
 
 def createMediator():
     if isSensorPositive():
@@ -175,7 +197,7 @@ def createMediator():
             med.worldPosition.x = (random() * 20) -10
             med.worldPosition.y = (random() * 20) -10
             med.localScale = [0.7, 0.7, 0.7 + (random() * 3)]
-            valves.append(med)
+            controls.append(med)
 
 def createAll():
     global valves
@@ -183,9 +205,13 @@ def createAll():
     control = None
     oscurl = None
     ctrl = None
+    color = None
+    instrGroup = None
     if isSensorPositive():
         updateContext()
-        for group in config.groups:
+        for name, group in config.groups.items():
+            instrGroup = name
+            print("*****************", group)
             for instrument in group['instruments']:
                 name = instrument
                 for control in group['controls']:
@@ -195,22 +221,27 @@ def createAll():
                     if "valve" in control:
                         print("creating valve ", control)
                         ctrl = "valveController"
+                        color = colors[0]
                     elif "speed" in control:
                         print("creating speed ", control)
                         ctrl = "speedController"
+                        color = colors[1]
                     else:
                         print("creating controller ", control)
                         ctrl = "otherController"
+                        color = colors[2]
                     med = Mediator(scene.addObject(ctrl, "Floor"))
                     med.oscurl = oscurl
                     med.id = name
                     med.control = control
+                    med.group = instrGroup
                     med.stopDynamics()
                     # med.worldPosition = [(random() * 10) -5, (random() * 5) + 5, 1]
                     med.worldPosition.x = (random() * 20) -10
                     med.worldPosition.y = (random() * 20) -10
                     stackInstruments(med)
                     med.localScale = [0.6, 0.6, 0.3 + (random())]
+                    med.color = color
                     controls.append(med)
                     
 def stackInstruments(instrument):
@@ -233,8 +264,9 @@ def playRandomAction():
 
 def updatePositions():
     global valves
-    for mediator in controls:
-        mediator.sendPosition()
+    if len(controls) > 0:
+        for mediator in controls:
+            mediator.sendPosition()
     if len(controls) > 0:
         for i in controls:
             distance = i.getDistanceTo(scene.objects['Forceer'])

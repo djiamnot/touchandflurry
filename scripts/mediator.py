@@ -13,6 +13,7 @@ class Mediator(bge.types.KX_GameObject):
         self.oscurl = None
         self.id = None
         self.control = None
+        self.group = None
         self.isDynamic = True
 
     def stopDynamics(self):
@@ -38,14 +39,13 @@ class Mediator(bge.types.KX_GameObject):
         return objPosition
 
     def sendPosition(self):
-        print("***********************************")
         velocityVector = self.getLinearVelocity()
         veloSum = sum(velocityVector)
         position = self.getFloorPosition()
         normalizedPosition = self.invert(abs(position.x))
-        if self.isDynamic and veloSum > 0.01:
+        if self.isDynamic:
             print("{}'s velocity: {}, normalized position: {}".format(self.oscurl, veloSum, normalizedPosition));
-            liblo.send(self.oscaddress, self.oscurl, normalizedPosition + veloSum)
+            liblo.send(self.oscaddress, self.oscurl, normalizedPosition)
         else:
             liblo.send(self.oscaddress, self.oscurl, 0)
 

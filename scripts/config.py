@@ -45,5 +45,5 @@ Choir = {
     'controls': ['valve/x', 'speed/x', 'dur/x']
 }
 
-groups =  [ThePipe, Tele, Choir]
+groups =  {'ThePipe': ThePipe, 'Tele': Tele, 'Choir': Choir}
 
