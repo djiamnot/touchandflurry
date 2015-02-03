@@ -14,7 +14,7 @@ class Mediator(bge.types.KX_GameObject):
         self.id = None
         self.control = None
         self.group = None
-        self.isDynamic = True
+        self.isDynamic = False
 
     def stopDynamics(self):
         self.isDynamic = False
