@@ -95,9 +95,7 @@ def randomForceMove():
                 c.isDynamic = False
             for c in controls:
                 if 'Pipe' in c.group:
-                    print("#########", c.group)
                     family.append(c)
-            print("************************", family)
             choices = randint(0, len(family))
             # for i in range(choices):
             #     control = randint(0, choices) 
@@ -168,7 +166,7 @@ def hoverBoardRay():
     screenPosition = pointingAt.worldTransform
     screenInverted = screenPosition.inverted()
     screenPosition = screenInverted * hitVector
-    print("PipeLvalve poining at {} {}".format(pointingAt, screenPosition))
+    #print("PipeLvalve poining at {} {}".format(pointingAt, screenPosition))
 
 def updateContext():
     global cont, obj, scene
@@ -267,11 +265,11 @@ def updatePositions():
     if len(controls) > 0:
         for mediator in controls:
             mediator.sendPosition()
-    if len(controls) > 0:
-        for i in controls:
-            distance = i.getDistanceTo(scene.objects['Forceer'])
-            if distance  < 3:
-                print("{} is at {} from Forceer".format(i, distance))
-                i.startDynamics()
-            else:
-                i.stopDynamics()
+    # if len(controls) > 0:
+    #     for i in controls:
+    #         distance = i.getDistanceTo(scene.objects['Forceer'])
+    #         if distance  < 3:
+    #             print("{} is at {} from Forceer".format(i, distance))
+    #             i.startDynamics()
+    #         else:
+    #             i.stopDynamics()
