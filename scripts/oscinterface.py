@@ -24,14 +24,14 @@ class OSCinterface():
         self.server.add_method(None, None, self.fallback)
 
     def accCallback(self, path, args):
-        print("accelerator", args)
+        #print("accelerator", args)
         self.logic.globalDict['intonaData']["accel_x"] = args[0]
         self.logic.globalDict['intonaData']["accel_y"] = args[1]
         self.logic.globalDict['intonaData']["accel_z"] = args[2]
 
 
     def orientCallback(self, path, args):
-        print("orientation", args)
+        #print("orientation", args)
         self.logic.globalDict['intonaData']["pitch"] = args[0]
         self.logic.globalDict['intonaData']['roll'] = args[1]
         self.logic.globalDict['intonaData']['yaw'] = args[2]

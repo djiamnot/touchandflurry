@@ -44,7 +44,7 @@ class Mediator(bge.types.KX_GameObject):
         position = self.getFloorPosition()
         normalizedPosition = self.invert(abs(position.x))
         if self.isDynamic:
-            print("{}'s velocity: {}, normalized position: {}".format(self.oscurl, veloSum, normalizedPosition));
+            #print("{}'s velocity: {}, normalized position: {}".format(self.oscurl, veloSum, normalizedPosition));
             liblo.send(self.oscaddress, self.oscurl, normalizedPosition)
         else:
             liblo.send(self.oscaddress, self.oscurl, 0)
