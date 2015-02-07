@@ -3,10 +3,13 @@ import os
 import sys
 
 from bge import logic
+from bge import events
 from mathutils import Color
 from mathutils import Vector
 from random import random
 from random import randint
+KEYBOARD = logic.keyboard
+ACTIVE = logic.KX_SENSOR_ACTIVE    
 
 CURDIR = logic.expandPath('//')
 SCRIPTS_PATH = os.path.join(CURDIR, 'scripts')
@@ -35,6 +38,32 @@ squares = []
 camera = 0
 
 controls = []
+
+currentySelected = []
+
+def keyboardCtrl():
+    bindings = {
+        'boo': events.BKEY,
+        'doo': events.DKEY
+    }
+    mapping = {'boo': removeParents, 'doo': silence}
+    activeKey = KEYBOARD.active_events
+    print(activeKey)
+    for k in activeKey:
+        key_id = k
+        state = activeKey[k]
+    if state > 0:
+        for k in bindings:
+            for key_id in activeKey:
+                if bindings[k] == key_id:
+                    function = mapping[k]
+                    function()
+
+def boo():
+    print("*************** BOO!")
+
+def doo():
+    print("*************** DOO!")
 
 def toggleCam():
     global camera, scene
@@ -92,6 +121,7 @@ def randomForceMove():
         if len(controls) > 0:
             for c in controls:
                 c.removeParent()
+                c.stopDynamics()
                 c.isDynamic = False
             for c in controls:
                 if 'Pipe' in c.group:
@@ -104,6 +134,22 @@ def randomForceMove():
             for f in family:
                 f.setParent("Forceer")
                 f.isDynamic = True
+                
+def removeParents():
+    updateContext()
+    if isSensorPositive():
+        if len(controls) > 0:
+            for c in controls:
+                c.removeParent()
+                c.startDynamics()
+                
+def silence():
+    updateContext()
+    if isSensorPositive():
+        if len(controls) > 0:
+            for c in controls:
+                c.removeParent()
+                c.stopDynamics()
 
 def getAmplitudes():
     global previousData, amplitudes
