@@ -44,9 +44,20 @@ currentySelected = []
 def keyboardCtrl():
     bindings = {
         'boo': events.BKEY,
-        'doo': events.DKEY
+        'doo': events.DKEY,
+        'pvalves': events.FKEY,
+        'cvalves': events.GKEY,
+        'tvalves': events.HKEY,
+        'pmotors': events.RKEY,
     }
-    mapping = {'boo': removeParents, 'doo': silence}
+    mapping = {
+        'boo': removeParents, 
+        'doo': silence,
+        'pvalves': addPipeValves,
+        'cvalves': addChoirValves,
+        'tvalves': addTeleValves,
+        'pmotors': addPipeMotors,
+    }
     activeKey = KEYBOARD.active_events
     print(activeKey)
     for k in activeKey:
@@ -58,12 +69,6 @@ def keyboardCtrl():
                 if bindings[k] == key_id:
                     function = mapping[k]
                     function()
-
-def boo():
-    print("*************** BOO!")
-
-def doo():
-    print("*************** DOO!")
 
 def toggleCam():
     global camera, scene
@@ -112,7 +117,26 @@ def intonaForce():
             math.radians(intonaData['yaw'])
         ]
 
-def randomForceMove():
+def addPipeValves():
+    addControllers('Pipe', 'valve')
+
+def addChoirValves():
+    addControllers('Choir', 'valve')
+
+def addTeleValves():
+    addControllers('Tele', 'valve')
+
+def addPipeMotors():
+    addControllers('Pipe', 'mute')
+    addControllers('Pipe', 'roller')
+    addControllers('Pipe', 'tirap')
+
+def addControllers(instrGroup, ctrlType):
+    """
+    Add some kind of controller. Either valve or other
+    groups: Pipe, Tele, Choir
+    control types: valve, roller, mute, tirapHoriz, tirapVert, speed, dur, length
+    """
     family = []
     updateContext()
     if isSensorPositive():
@@ -120,12 +144,20 @@ def randomForceMove():
         # force.worldLinearVelocity = [(random()*1000) - 500, (random()*1000) - 500, (random()*1000) - 500]
         if len(controls) > 0:
             for c in controls:
-                c.removeParent()
-                c.stopDynamics()
-                c.isDynamic = False
-            for c in controls:
-                if 'Pipe' in c.group:
+                print("group", c.group)
+                print("controller", c.control)
+                # c.removeParent()
+                # c.stopDynamics()
+                # c.isDynamic = False
+                print("found this controller", c.control)
+                if ctrlType in c.control and instrGroup in c.group:
+                    print("-=-=-= adding", c.group, c.control, c)
                     family.append(c)
+                    
+                # if 'Pipe' in c.group:
+                #     print("--- group", c.group)
+                #     print("--- controller ", c)
+                #     family.append(c)
             choices = randint(0, len(family))
             # for i in range(choices):
             #     control = randint(0, choices) 
@@ -137,10 +169,14 @@ def randomForceMove():
                 
 def removeParents():
     updateContext()
+    intonaData = getIntonaData()
     if isSensorPositive():
         if len(controls) > 0:
             for c in controls:
+                vel_x = intonaData['accel_x']*random()*0.01
+                vel_y = intonaData['accel_y']*random()*0.01
                 c.removeParent()
+                c.worldLinearVelocity = [vel_x, vel_y, 0]
                 c.startDynamics()
                 
 def silence():
@@ -308,9 +344,12 @@ def playRandomAction():
 
 def updatePositions():
     global valves
+    intonaData = getIntonaData()
+    scalingFactor = intonaData['ir']
+    posCoeff = scalingFactor * 0.001
     if len(controls) > 0:
         for mediator in controls:
-            mediator.sendPosition()
+            mediator.sendPosition(posCoeff)
     # if len(controls) > 0:
     #     for i in controls:
     #         distance = i.getDistanceTo(scene.objects['Forceer'])
