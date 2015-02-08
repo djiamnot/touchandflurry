@@ -6,6 +6,7 @@ from random import random
 class Mediator(bge.types.KX_GameObject):
     def __init__ (self, old_owner):
         self.oscaddress = liblo.Address("192.168.0.20", 8188)
+        #self.oscaddress = liblo.Address("localhost", 8188)
         self.cont = bge.logic.getCurrentController()
         self.obj = self.cont.owner
         self.curScene = None
@@ -15,6 +16,12 @@ class Mediator(bge.types.KX_GameObject):
         self.control = None
         self.group = None
         self.isDynamic = False
+        self.active = False
+        self.alpha = self.color[3]
+
+    def setAlpha(self, alpha):
+        self.alpha = alpha
+        self.color[3] = self.alpha
 
     def stopDynamics(self):
         self.isDynamic = False
@@ -38,16 +45,21 @@ class Mediator(bge.types.KX_GameObject):
         objPosition = invertedPosition * position
         return objPosition
 
-    def sendPosition(self):
+    def sendPosition(self, factor):
         velocityVector = self.getLinearVelocity()
         veloSum = sum(velocityVector)
         position = self.getFloorPosition()
-        normalizedPosition = self.invert(abs(position.x))
+        normalizedPosition = self.invert(abs(position.x)) * factor
+        self.setAlpha(normalizedPosition)
         if self.isDynamic:
+            self.active = True
             #print("{}'s velocity: {}, normalized position: {}".format(self.oscurl, veloSum, normalizedPosition));
             liblo.send(self.oscaddress, self.oscurl, normalizedPosition)
         else:
-            liblo.send(self.oscaddress, self.oscurl, 0)
+            if self.active and 'valve' in self.control:
+                liblo.send(self.oscaddress, self.oscurl, 0)
+            else:
+                self.active = False
 
     def invert(self, f):
         ret = abs(f-1)
