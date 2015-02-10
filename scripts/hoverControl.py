@@ -49,6 +49,7 @@ def keyboardCtrl():
         'cvalves': events.GKEY,
         'tvalves': events.HKEY,
         'pmotors': events.RKEY,
+        'gpositions': events.OKEY,
     }
     mapping = {
         'boo': removeParents, 
@@ -57,6 +58,7 @@ def keyboardCtrl():
         'cvalves': addChoirValves,
         'tvalves': addTeleValves,
         'pmotors': addPipeMotors,
+        'gpositions': getPositions,
     }
     activeKey = KEYBOARD.active_events
     print(activeKey)
@@ -117,6 +119,9 @@ def intonaForce():
             math.radians(intonaData['yaw'])
         ]
 
+def  getPositions():
+    print([(c.oscurl, c.worldPosition) for c in controls])
+
 def addPipeValves():
     addControllers('Pipe', 'valve')
 
@@ -134,7 +139,7 @@ def addPipeMotors():
 def addControllers(instrGroup, ctrlType):
     """
     Add some kind of controller. Either valve or other
-    groups: Pipe, Tele, Choir
+b    groups: Pipe, Tele, Choir
     control types: valve, roller, mute, tirapHoriz, tirapVert, speed, dur, length
     """
     family = []
@@ -153,6 +158,7 @@ def addControllers(instrGroup, ctrlType):
                 if ctrlType in c.control and instrGroup in c.group:
                     print("-=-=-= adding", c.group, c.control, c)
                     family.append(c)
+                    c.chosen = True
                     
                 # if 'Pipe' in c.group:
                 #     print("--- group", c.group)
@@ -166,6 +172,11 @@ def addControllers(instrGroup, ctrlType):
             for f in family:
                 f.setParent("Forceer")
                 f.isDynamic = True
+                if 'C2' in f.oscurl:
+                    print("!!!!!!!!!!!! Membrane! ")
+                    f.valveForce = 0.15
+                else:
+                    f.valveForce = 0.5
                 
 def removeParents():
     updateContext()
@@ -173,11 +184,26 @@ def removeParents():
     if isSensorPositive():
         if len(controls) > 0:
             for c in controls:
+                xpos = random() * 10 -5
+                ypos = random() * 10 -5
+                zpos = random() * 3
                 vel_x = intonaData['accel_x']*random()*0.01
                 vel_y = intonaData['accel_y']*random()*0.01
                 c.removeParent()
-                c.worldLinearVelocity = [vel_x, vel_y, 0]
-                c.startDynamics()
+                #c.worldLinearVelocity = [vel_x, vel_y, 0]
+                c.stopDynamics()
+                c.valveForce = 0.5
+                if c.chosen:
+                    c.startDynamics()
+                    if 'C2' in c.oscurl:
+                        c.valveForce = 0.1
+                    else:
+                        c.valveForce = 0.5
+                    c.nextPosition(speed=1)
+                else:
+                    c.isDynamic = False
+                    c.chosen = False
+                
                 
 def silence():
     updateContext()
@@ -185,6 +211,7 @@ def silence():
         if len(controls) > 0:
             for c in controls:
                 c.removeParent()
+                c.chosen = False
                 c.stopDynamics()
 
 def getAmplitudes():
@@ -349,7 +376,7 @@ def updatePositions():
     posCoeff = scalingFactor * 0.001
     if len(controls) > 0:
         for mediator in controls:
-            mediator.sendPosition(posCoeff)
+            mediator.update()
     # if len(controls) > 0:
     #     for i in controls:
     #         distance = i.getDistanceTo(scene.objects['Forceer'])
