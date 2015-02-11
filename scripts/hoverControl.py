@@ -258,7 +258,7 @@ def createAll():
                     med.worldPosition.x = (random() * 20) -10
                     med.worldPosition.y = (random() * 20) -10
                     stackInstruments(med)
-                    med.localScale = [0.4, 0.4, 0.3 + (random())]
+                    med.localScale = [1.5, 1.5, 0.8 + (random())]
                     med.color = color
                     controls.append(med)
                     
