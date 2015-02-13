@@ -51,7 +51,6 @@ class Control:
                     f.setParent("Forceer")
                     f.isDynamic = True
                     if 'C2' in f.oscurl:
-                        print("!!!!!!!!!!!! Membrane! ")
                         f.valveForce = 0.15
                     else:
                         f.valveForce = 0.5

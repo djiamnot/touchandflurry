@@ -75,6 +75,7 @@ def keyboardCtrl():
                     function()
 
 def toggleCam():
+
     global camera, scene
     if context.isSensorPositive():
         camera = not camera
@@ -119,7 +120,7 @@ def intonaForce():
             math.radians(intonaData['yaw'])
         ]
 
-def  getPositions():
+def getPositions():
     print([(c.oscurl, c.worldPosition) for c in controls])
 
 def addPipeValves():
@@ -258,7 +259,7 @@ def createAll():
                     med.worldPosition.x = (random() * 20) -10
                     med.worldPosition.y = (random() * 20) -10
                     stackInstruments(med)
-                    med.localScale = [1.5, 1.5, 0.8 + (random())]
+                    med.localScale = [0.5, 0.5, 0.5 + (random())]
                     med.color = color
                     controls.append(med)
                     
@@ -283,7 +284,10 @@ def playRandomAction():
 def updatePositions():
     global valves
     intonaData = ctl.getIntonaData()
+    print("--------------->     piezd:{}      pizm:{}      ir:{}".format(intonaData["piezd"], intonaData["piezm"], intonaData["ir"]))
     scalingFactor = intonaData['ir']
+    
+    
     posCoeff = scalingFactor * 0.001
     if len(controls) > 0:
         for mediator in controls:
