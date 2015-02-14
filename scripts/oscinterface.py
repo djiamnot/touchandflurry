@@ -21,6 +21,7 @@ class OSCinterface():
     def registerCallbacks(self):
         self.server.add_method("/acc", "fff", self.accCallback)
         self.server.add_method("/orientation", "fff", self.orientCallback)
+        self.server.add_method("/light", "f", self.lightCallback)
         self.server.add_method(None, None, self.fallback)
 
     def accCallback(self, path, args):
@@ -35,6 +36,10 @@ class OSCinterface():
         self.logic.globalDict['intonaData']["pitch"] = args[0]
         self.logic.globalDict['intonaData']['roll'] = args[1]
         self.logic.globalDict['intonaData']['yaw'] = args[2]
+
+    def lightCallback(self, path, args):
+        #print("orientation", args)
+        self.logic.globalDict['intonaData']["ir"] = args[0]
 
     def fallback(self, path, args):
         print ("received unknown message {0} ~ {1}".format(path, args))
