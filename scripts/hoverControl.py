@@ -20,6 +20,7 @@ import config
 import context
 from mediator import Mediator
 from control import Control
+import utils
 
 
 ALPHA = 1.0
@@ -32,14 +33,12 @@ colors = [
 ]
 previousData = {}
 amplitudes = {}
-
 squares = []
-
 camera = 0
-
 controls = []
-
 currentySelected = []
+
+pipes = []
 
 ctl = Control(controls)
 
@@ -52,6 +51,7 @@ def keyboardCtrl():
         'tvalves': events.HKEY,
         'pmotors': events.RKEY,
         'gpositions': events.OKEY,
+        'addpipes': events.PKEY,
     }
     mapping = {
         'boo': ctl.removeParents, 
@@ -61,13 +61,14 @@ def keyboardCtrl():
         'tvalves': addTeleValves,
         'pmotors': addPipeMotors,
         'gpositions': getPositions,
+        'addpipes': addPipes,
     }
     activeKey = KEYBOARD.active_events
     print(activeKey)
     for k in activeKey:
         key_id = k
         state = activeKey[k]
-    if state > 0:
+    if state == 1:
         for k in bindings:
             for key_id in activeKey:
                 if bindings[k] == key_id:
@@ -120,11 +121,63 @@ def intonaForce():
             math.radians(intonaData['yaw'])
         ]
 
+def addPipes():
+    global pipes
+    print ("adding pipes")
+    populateControls("Pipe", pipes)
+
+def populateControls(family, array):
+    name = None
+    control = None
+    oscurl = None
+    ctrl = None
+    color = None
+    instrGroup = None
+    if context.isSensorPositive():
+        context.updateContext()
+        for name, group in config.groups.items():
+            if family in name:
+                instrGroup = name
+                for instrument in group["instruments"]:
+                    name = instrument
+                    print("--> instrument", instrument)
+                    for control in group["controls"]:
+                        print("  --> control: ", control)
+                        control = control
+                        oscurl = os.path.join("/", name, control)
+                        if "valve" in control:
+                            print("creating valve ", control)
+                            ctrl = "valveController"
+                            color = colors[0]
+                        elif "speed" in control:
+                            print("creating speed ", control)
+                            ctrl = "speedController"
+                            color = colors[1]
+                        else:
+                            print("creating controller ", control)
+                            ctrl = "otherController"
+                            color = colors[2]
+                        med = Mediator(context.scene.addObject(ctrl, name))
+                        med.oscurl = oscurl
+                        med.id = name
+                        med.control = control
+                        med.group = instrGroup
+                        med.stopDynamics()
+                        # med.worldPosition = [(random() * 10) -5, (random() * 5) + 5, 1]
+                        #med.worldPosition.x = (random() * 20) -10
+                        #med.worldPosition.y = (random() * 20) -10
+                        stackInstruments(med)
+                        med.localScale = [0.5, 0.5, 0.5 + (random())]
+                        med.color = color
+                        controls.append(med)
+
+
 def getPositions():
     print([(c.oscurl, c.worldPosition) for c in controls])
 
 def addPipeValves():
-    ctl.addControllers('Pipe', 'valve')
+    vCtl = Control(pipes)
+    vCtl.addControllers('Pipe', 'valve')
 
 def addChoirValves():
     ctl.addControllers('Choir', 'valve')
@@ -284,11 +337,13 @@ def playRandomAction():
 def updatePositions():
     global valves
     intonaData = ctl.getIntonaData()
-    print("--------------->     piezd:{}      pizm:{}      ir:{}".format(intonaData["piezd"], intonaData["piezm"], intonaData["ir"]))
-    scalingFactor = intonaData['ir']
-    
-    
-    posCoeff = scalingFactor * 0.001
+    #print("--------------->     piezd:{}      pizm:{}      ir:{}".format(intonaData["piezd"], intonaData["piezm"], intonaData["ir"]))
+    ir = intonaData['ir']
+    #context.scene.objects["Forceer"].worldPosition.z = ir*0.01
+    context.scene.lights["ShowerLight"].energy = utils.scale(ir*0.01,0.2, 0.8, 0.01, 0.99) 
+    #context.scene.lights["ShowerLight"].color = [intonaData["accel_x"] * 0.01, 0,intonaData["accel_y"] * 0.01 ]
+    #print("----------> ", context.scene.lights)
+    #posCoeff = scalingFactor * 0.001
     if len(controls) > 0:
         for mediator in controls:
             mediator.update()

@@ -47,11 +47,11 @@ class Mediator(bge.types.KX_GameObject):
         self.color[3] = self.alpha
 
     def stopDynamics(self):
-        self.isDynamic = False
+        #self.isDynamic = False
         self.suspendDynamics()
 
     def startDynamics(self):
-        self.isDynamic = True
+        #self.isDynamic = True
         self.restoreDynamics()
 
 
@@ -72,7 +72,8 @@ class Mediator(bge.types.KX_GameObject):
         velocityVector = self.getLinearVelocity()
         veloSum = sum(velocityVector)
         position = self.getFloorPosition()
-        normalizedPosition = self.invert(abs(position.x)) * self.valveForce
+        #normalizedPosition = self.invert(abs(position.x)) * self.valveForce
+        normalizedPosition = self.invert(abs(position.x)) * (position.y + 1) - 0.5
         self.setAlpha(normalizedPosition)
         if self.isDynamic:
             self.active = True

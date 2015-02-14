@@ -7,12 +7,12 @@ from random import randint
 
 class Control:
     def __init__(self, controls):
+        print("control class with", controls)
         self.context = context
         self.controls = controls
 
     def getIntonaData(self):
-        return self.context.logic.globalDict['intonaData']
-
+        return self.context.logic.globalDict['intonaData']        
 
     def addControllers(self,instrGroup, ctrlType):
         """
