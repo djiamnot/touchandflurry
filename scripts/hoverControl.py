@@ -125,6 +125,7 @@ def addPipes():
     global pipes
     print ("adding pipes")
     populateControls("Pipe", pipes)
+    print("================ ", pipes)
 
 def populateControls(family, array):
     name = None
@@ -133,6 +134,7 @@ def populateControls(family, array):
     ctrl = None
     color = None
     instrGroup = None
+    controls = array
     if context.isSensorPositive():
         context.updateContext()
         for name, group in config.groups.items():

@@ -5,8 +5,8 @@ from random import random
 
 class Mediator(bge.types.KX_GameObject):
     def __init__ (self, old_owner):
-        self.oscaddress = liblo.Address("192.168.0.20", 8188)
-        #self.oscaddress = liblo.Address("localhost", 8188)
+        #self.oscaddress = liblo.Address("192.168.0.20", 8188)
+        self.oscaddress = liblo.Address("localhost", 8188)
         self.cont = bge.logic.getCurrentController()
         self.obj = self.cont.owner
         self.curScene = None
