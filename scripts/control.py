@@ -50,6 +50,7 @@ class Control:
                 for f in family:
                     f.setParent("Forceer")
                     f.isDynamic = True
+                    f.active = True
                     if 'C2' in f.oscurl:
                         f.valveForce = 0.15
                     else:

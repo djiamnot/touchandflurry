@@ -5,8 +5,8 @@ from random import random
 
 class Mediator(bge.types.KX_GameObject):
     def __init__ (self, old_owner):
-        #self.oscaddress = liblo.Address("192.168.0.20", 8188)
-        self.oscaddress = liblo.Address("localhost", 8188)
+        self.oscaddress = liblo.Address("192.168.0.20", 8188)
+        #self.oscaddress = liblo.Address("localhost", 8188)
         self.cont = bge.logic.getCurrentController()
         self.obj = self.cont.owner
         self.curScene = None
@@ -69,14 +69,15 @@ class Mediator(bge.types.KX_GameObject):
         return objPosition
 
     def sendPosition(self):
+        
         velocityVector = self.getLinearVelocity()
         veloSum = sum(velocityVector)
         position = self.getFloorPosition()
         #normalizedPosition = self.invert(abs(position.x)) * self.valveForce
-        normalizedPosition = self.invert(abs(position.x)) * (position.y + 1) - 0.5
+        normalizedPosition = self.invert(abs(position.x)) * 0.7
         self.setAlpha(normalizedPosition)
-        if self.isDynamic:
-            self.active = True
+        if self.isDynamic and self.active:
+            print ("boo")
             #print("{}'s velocity: {}, normalized position: {}".format(self.oscurl, veloSum, normalizedPosition));
             liblo.send(self.oscaddress, self.oscurl, normalizedPosition)
         else:

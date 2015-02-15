@@ -39,6 +39,8 @@ controls = []
 currentySelected = []
 
 pipes = []
+telescopics = []
+choirs = []
 
 ctl = Control(controls)
 
@@ -52,6 +54,7 @@ def keyboardCtrl():
         'pmotors': events.RKEY,
         'gpositions': events.OKEY,
         'addpipes': events.PKEY,
+        'addteles': events.TKEY,
     }
     mapping = {
         'boo': ctl.removeParents, 
@@ -62,6 +65,7 @@ def keyboardCtrl():
         'pmotors': addPipeMotors,
         'gpositions': getPositions,
         'addpipes': addPipes,
+        'addteles': addTelescopics,
     }
     activeKey = KEYBOARD.active_events
     print(activeKey)
@@ -126,6 +130,12 @@ def addPipes():
     print ("adding pipes")
     populateControls("Pipe", pipes)
     print("================ ", pipes)
+
+def addTelescopics():
+    global telescopics
+    print ("adding telescopics")
+    populateControls("Tele", telescopics)
+    print("================ ", telescopics)
 
 def populateControls(family, array):
     name = None
@@ -342,13 +352,14 @@ def updatePositions():
     #print("--------------->     piezd:{}      pizm:{}      ir:{}".format(intonaData["piezd"], intonaData["piezm"], intonaData["ir"]))
     ir = intonaData['ir']
     #context.scene.objects["Forceer"].worldPosition.z = ir*0.01
-    context.scene.lights["ShowerLight"].energy = utils.scale(ir*0.01,0.2, 0.8, 0.01, 0.99) 
+    context.scene.lights["ShowerLight"].energy = utils.scale(ir*0.001,0.2, 0.8, 0.01, 0.99) 
     #context.scene.lights["ShowerLight"].color = [intonaData["accel_x"] * 0.01, 0,intonaData["accel_y"] * 0.01 ]
     #print("----------> ", context.scene.lights)
     #posCoeff = scalingFactor * 0.001
-    if len(controls) > 0:
-        for mediator in controls:
-            mediator.update()
+    for collection in [pipes, choirs, telescopics]:
+        if len(collection) > 0:
+            updateMediators(collection)
+    
     # if len(controls) > 0:
     #     for i in controls:
     #         distance = i.getDistanceTo(scene.objects['Forceer'])
@@ -357,3 +368,7 @@ def updatePositions():
     #             i.startDynamics()
     #         else:
     #             i.stopDynamics()
+
+def updateMediators(collection):
+    for mediator in collection:
+        mediator.update()
