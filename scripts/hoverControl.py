@@ -55,10 +55,12 @@ def keyboardCtrl():
         'gpositions': events.OKEY,
         'addpipes': events.PKEY,
         'addteles': events.TKEY,
+        'addchoirs': events.YKEY,
+        'origins': events.QKEY,
     }
     mapping = {
-        'boo': ctl.removeParents, 
-        'doo': ctl.silence,
+        'boo': removeAllParents, 
+        'doo': silenceAll,
         'pvalves': addPipeValves,
         'cvalves': addChoirValves,
         'tvalves': addTeleValves,
@@ -66,6 +68,9 @@ def keyboardCtrl():
         'gpositions': getPositions,
         'addpipes': addPipes,
         'addteles': addTelescopics,
+        'addchoirs': addChoirs,
+        'origins': returnAllToOrigin,
+        
     }
     activeKey = KEYBOARD.active_events
     print(activeKey)
@@ -125,6 +130,17 @@ def intonaForce():
             math.radians(intonaData['yaw'])
         ]
 
+def removeAllParents():
+    for collection in [pipes, choirs, telescopics]:
+        if len(collection) > 0:
+            ctl.removeParents(collection)
+
+def silenceAll():
+    for collection in [pipes, choirs, telescopics]:
+        if len(collection) > 0:
+            ctl.silence(collection)
+
+
 def addPipes():
     global pipes
     print ("adding pipes")
@@ -136,6 +152,13 @@ def addTelescopics():
     print ("adding telescopics")
     populateControls("Tele", telescopics)
     print("================ ", telescopics)
+
+def addChoirs():
+    global choirs
+    print ("adding choirs")
+    populateControls("Choir", choirs)
+    print("================ ", choirs)
+
 
 def populateControls(family, array):
     name = None
@@ -181,9 +204,15 @@ def populateControls(family, array):
                         stackInstruments(med)
                         med.localScale = [0.5, 0.5, 0.5 + (random())]
                         med.color = color
+                        med.setOrigin(med.localPosition)
                         controls.append(med)
 
-
+def returnAllToOrigin():
+    for collection in [pipes, choirs, telescopics]:
+        if len(collection) > 0:
+            vCtl = Control(collection)
+            vCtl.returnToOrigin()
+                
 def getPositions():
     print([(c.oscurl, c.worldPosition) for c in controls])
 
@@ -192,10 +221,12 @@ def addPipeValves():
     vCtl.addControllers('Pipe', 'valve')
 
 def addChoirValves():
-    ctl.addControllers('Choir', 'valve')
+    vCtl = Control(choirs)
+    vCtl.addControllers('Choir', 'valve')
 
 def addTeleValves():
-    ctl.addControllers('Tele', 'valve')
+    vCtl = Control(telescopics)
+    vCtl.addControllers('Tele', 'valve')
 
 def addPipeMotors():
     ctl.addControllers('Pipe', 'mute')
@@ -358,7 +389,7 @@ def updatePositions():
     #posCoeff = scalingFactor * 0.001
     for collection in [pipes, choirs, telescopics]:
         if len(collection) > 0:
-            updateMediators(collection)
+            updateMediators(collection, ir)
     
     # if len(controls) > 0:
     #     for i in controls:
@@ -369,6 +400,7 @@ def updatePositions():
     #         else:
     #             i.stopDynamics()
 
-def updateMediators(collection):
+def updateMediators(collection, ir):
     for mediator in collection:
         mediator.update()
+        mediator.valveForce = utils.scale(ir*0.001,0.2, 0.8, 0.01, 0.99) 

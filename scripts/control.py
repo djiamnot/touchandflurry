@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
-
 import context
 from random import random
 from random import randint
+from mathutils import Vector
 
 class Control:
     def __init__(self, controls):
@@ -56,12 +56,13 @@ class Control:
                     else:
                         f.valveForce = 0.5
                         
-    def removeParents(self):
+    def removeParents(self, collection):
         self.context.updateContext()
         intonaData = self.getIntonaData()
         if self.context.isSensorPositive():
-            if len(self.controls) > 0:
-                for c in self.controls:
+            if len(collection) > 0:
+                for c in collection:
+                    print("removing parent of {} in {}".format(c, collection))
                     xpos = random() * 10 -5
                     ypos = random() * 10 -5
                     zpos = random() * 3
@@ -79,15 +80,29 @@ class Control:
                             c.valveForce = 0.5
                             c.nextPosition(speed=1)
                     else:
-                        c.isDynamic = False
+                        c.isDynamic = True
                         c.chosen = False
                         
                 
-    def silence(self):
+    def silence(self, collection):
+        self.context.updateContext()
+        if self.context.isSensorPositive():
+            if len(collection) > 0:
+                for c in collection:
+                    c.removeParent()
+                    c.chosen = False
+                    c.active = False
+                    c.stopDynamics()
+
+    def returnToOrigin(self):
         self.context.updateContext()
         if self.context.isSensorPositive():
             if len(self.controls) > 0:
                 for c in self.controls:
                     c.removeParent()
                     c.chosen = False
+                    c.active = True
                     c.stopDynamics()
+                    print(" ~~~~~ returning to: ", c.origin)
+                    origin = c.origin
+                    c.goTo(Vector(origin), speed=1)

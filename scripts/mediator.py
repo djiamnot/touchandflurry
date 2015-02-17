@@ -7,6 +7,7 @@ class Mediator(bge.types.KX_GameObject):
     def __init__ (self, old_owner):
         self.oscaddress = liblo.Address("192.168.0.20", 8188)
         #self.oscaddress = liblo.Address("localhost", 8188)
+        self.origin = Vector((0.0, 0.0, 0.0))
         self.cont = bge.logic.getCurrentController()
         self.obj = self.cont.owner
         self.curScene = None
@@ -20,21 +21,20 @@ class Mediator(bge.types.KX_GameObject):
         self.alpha = self.color[3]
         self.moving = False
         self.chosen = False
-        self.positions = [
-            Vector((-1.5331803560256958, 6.896184921264648, 0.46540725231170654)),
-            Vector((4.887482166290283, 5.136416435241699, 1.3687291145324707)),
-            Vector((9.9852876663208, -6.656444549560547, 3.5)),
-            Vector((0.6560080051422119, 3.932088613510132, 3.5)),
-            Vector((4.468418121337891, -4.627209186553955, 3.5)),
-            Vector((8.378759384155273, 4.905496120452881, 2.5)),
-        ]
         self.currentPosition = 0
         self.valveForce = 0
         self.toUpdate = []
         self.callbacks = {}
         self.speed = Vector((0.0, 0.0, 0.0))
         self.destination = Vector((0.0, 0.0, 0.0))
-       
+        self.positions = [
+            Vector((4.468418121337891, -4.627209186553955, 3.5)),
+            self.origin
+        ]
+    
+    def setOrigin(self, vector):
+        self.origin = vector
+
     def nextPosition(self, speed):
         self.goTo(self.positions[self.currentPosition], speed )
         if self.currentPosition < len(self.positions) -1:
@@ -69,22 +69,24 @@ class Mediator(bge.types.KX_GameObject):
         return objPosition
 
     def sendPosition(self):
-        
         velocityVector = self.getLinearVelocity()
         veloSum = sum(velocityVector)
         position = self.getFloorPosition()
         #normalizedPosition = self.invert(abs(position.x)) * self.valveForce
-        normalizedPosition = self.invert(abs(position.x)) * 0.7
+        if 'C2' in self.oscurl:
+            normalizedPosition = self.invert(abs(position.x)) * self.valveForce * 0.2
+        else:
+            normalizedPosition = self.invert(abs(position.x)) * self.valveForce
         self.setAlpha(normalizedPosition)
         if self.isDynamic and self.active:
-            print ("boo")
             #print("{}'s velocity: {}, normalized position: {}".format(self.oscurl, veloSum, normalizedPosition));
             liblo.send(self.oscaddress, self.oscurl, normalizedPosition)
         else:
-            if self.active and 'valve' in self.control:
+            if 'valve' in self.control:
                 liblo.send(self.oscaddress, self.oscurl, 0)
             else:
                 self.active = False
+
     def moveTo(self, vector):
         print("-=-=-=-=- moving {} to {}".format(self.id, vector))
         self.applyMovement(vector)
@@ -94,6 +96,8 @@ class Mediator(bge.types.KX_GameObject):
         return ret
 
     def goTo(self, destination=None, speed=None, local=False, update=False, callback=None):
+        print("going to", destination)
+        print("~~~~~~~~ my origin is ", self.origin)
         if not update:
             if destination is None or speed is None:
                 return False
