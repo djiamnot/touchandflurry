@@ -57,6 +57,7 @@ def keyboardCtrl():
         'addteles': events.TKEY,
         'addchoirs': events.YKEY,
         'origins': events.QKEY,
+        'randomvalve': events.ZKEY,
     }
     mapping = {
         'boo': removeAllParents, 
@@ -70,7 +71,8 @@ def keyboardCtrl():
         'addteles': addTelescopics,
         'addchoirs': addChoirs,
         'origins': returnAllToOrigin,
-        
+        #'randomvalve': playRandomValve,
+        'randomvalve': tubeLengths,
     }
     activeKey = KEYBOARD.active_events
     print(activeKey)
@@ -399,8 +401,29 @@ def updatePositions():
     #             i.startDynamics()
     #         else:
     #             i.stopDynamics()
+def playRandomValve():
+    vCtl = Control(choirs)
+    v = vCtl.getControlsByType("valve");
+    rand = randint(0, len(v))
+    v[rand].isActive = True
+    v[rand].isDynamic = True
+    v[rand].goTo(Vector(utils.randomPosition()),speed=30, active=True)
+
+def tubeLengths():
+    vCtl = Control(telescopics)
+    lenghts = vCtl.getControlsByType("length")
+    print("[] lengths", lenghts)
+    for i in lenghts:
+        i.goTo(Vector(utils.randomPosition()),speed=60, active=True)
+        i.isActive = True
+        i.isDynamic = True
 
 def updateMediators(collection, ir):
     for mediator in collection:
         mediator.update()
         mediator.valveForce = utils.scale(ir*0.001,0.2, 0.8, 0.01, 0.99) 
+
+def goTocb(ctl):
+    print("goto callback", ctl)
+    ctl.isActive = False
+    ctl.isDynamic = False

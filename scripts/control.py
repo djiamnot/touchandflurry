@@ -37,7 +37,7 @@ class Control:
                         print("-=-=-= adding", c.group, c.control, c)
                         family.append(c)
                         c.chosen = True
-                    
+                        c.stopDynamics()
                         # if 'Pipe' in c.group:
                         #     print("--- group", c.group)
                         #     print("--- controller ", c)
@@ -78,7 +78,7 @@ class Control:
                             c.valveForce = 0.1
                         else:
                             c.valveForce = 0.5
-                            c.nextPosition(speed=1)
+                            c.nextPosition(speed=30)
                     else:
                         c.isDynamic = True
                         c.chosen = False
@@ -101,8 +101,22 @@ class Control:
                 for c in self.controls:
                     c.removeParent()
                     c.chosen = False
-                    c.active = True
+                    #c.active = True
                     c.stopDynamics()
-                    print(" ~~~~~ returning to: ", c.startingPosition)
-                    origin = c.startingPosition
-                    c.goTo(origin, speed=1)
+                    #print(" ~~~~~ returning to: ", c.startingPosition)
+                    #origin = c.startingPosition
+                    #c.goTo(origin, speed=1)
+
+    def getControlsByType(self, ctlType):
+        """
+        @param: control type (valve, speed, length etc...)
+        """
+        valves = []
+        self.context.updateContext()
+        if self.context.isSensorPositive():
+            if len(self.controls) > 0:
+                for c in self.controls:
+                    if ctlType in c.control:
+                        print("Found valve", c.control)
+                        valves.append(c)
+        return valves
