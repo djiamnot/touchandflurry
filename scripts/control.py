@@ -103,6 +103,6 @@ class Control:
                     c.chosen = False
                     c.active = True
                     c.stopDynamics()
-                    print(" ~~~~~ returning to: ", c.origin)
-                    origin = c.origin
-                    c.goTo(Vector(origin), speed=1)
+                    print(" ~~~~~ returning to: ", c.startingPosition)
+                    origin = c.startingPosition
+                    c.goTo(origin, speed=1)

@@ -38,8 +38,8 @@ class OSCinterface():
         self.logic.globalDict['intonaData']['yaw'] = args[2]
 
     def lightCallback(self, path, args):
-        #print("orientation", args)
-        self.logic.globalDict['intonaData']["ir"] = args[0]
+        print("light", args)
+        self.logic.globalDict['intonaData']["ir"] = args[0]*10
 
     def fallback(self, path, args):
         print ("received unknown message {0} ~ {1}".format(path, args))

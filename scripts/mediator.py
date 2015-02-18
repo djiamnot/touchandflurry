@@ -7,7 +7,7 @@ class Mediator(bge.types.KX_GameObject):
     def __init__ (self, old_owner):
         self.oscaddress = liblo.Address("192.168.0.20", 8188)
         #self.oscaddress = liblo.Address("localhost", 8188)
-        self.origin = Vector((0.0, 0.0, 0.0))
+        self.startingPosition = Vector((0.0, 0.0, 0.0))
         self.cont = bge.logic.getCurrentController()
         self.obj = self.cont.owner
         self.curScene = None
@@ -29,11 +29,11 @@ class Mediator(bge.types.KX_GameObject):
         self.destination = Vector((0.0, 0.0, 0.0))
         self.positions = [
             Vector((4.468418121337891, -4.627209186553955, 3.5)),
-            self.origin
+            # self.startingPosition
         ]
     
-    def setOrigin(self, vector):
-        self.origin = vector
+    def setStartingPosition(self, vector):
+        self.startingPosition = vector
 
     def nextPosition(self, speed):
         self.goTo(self.positions[self.currentPosition], speed )
@@ -97,7 +97,8 @@ class Mediator(bge.types.KX_GameObject):
 
     def goTo(self, destination=None, speed=None, local=False, update=False, callback=None):
         print("going to", destination)
-        print("~~~~~~~~ my origin is ", self.origin)
+        print("--> my startingPosition is ", self.startingPosition)
+        print("  --> my current position", self.localPosition)
         if not update:
             if destination is None or speed is None:
                 return False

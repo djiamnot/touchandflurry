@@ -204,7 +204,7 @@ def populateControls(family, array):
                         stackInstruments(med)
                         med.localScale = [0.5, 0.5, 0.5 + (random())]
                         med.color = color
-                        med.setOrigin(med.localPosition)
+                        med.setStartingPosition(med.localPosition)
                         controls.append(med)
 
 def returnAllToOrigin():
