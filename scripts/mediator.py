@@ -47,7 +47,7 @@ class Mediator(bge.types.KX_GameObject):
         self.color[3] = self.alpha
 
     def stopDynamics(self):
-        #self.isDynamic = False
+        # self.isDynamic = False
         self.suspendDynamics()
 
     def startDynamics(self):
@@ -95,10 +95,7 @@ class Mediator(bge.types.KX_GameObject):
         ret = abs(f-1)
         return ret
 
-    def goTo(self, destination=None, speed=None, local=False, update=False, callback=None):
-        print("going to", destination)
-        print("--> my startingPosition is ", self.startingPosition)
-        print("  --> my current position", self.localPosition)
+    def goTo(self, destination=None, speed=None, local=False, update=False, callback=None, active=False):
         if not update:
             if destination is None or speed is None:
                 return False
