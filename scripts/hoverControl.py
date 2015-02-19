@@ -190,6 +190,10 @@ def populateControls(family, array):
                             print("creating speed ", control)
                             ctrl = "speedController"
                             color = colors[1]
+                        elif "roller" in control:
+                            print("creating roller ", control)
+                            ctrl = "rollerController"
+                            color = colors[1]
                         else:
                             print("creating controller ", control)
                             ctrl = "otherController"
@@ -206,7 +210,7 @@ def populateControls(family, array):
                         stackInstruments(med)
                         med.localScale = [0.5, 0.5, 0.5 + (random())]
                         med.color = color
-                        med.setStartingPosition(med.localPosition)
+                        med.setStartingPosition(context.scene.objects[name].worldPosition)
                         controls.append(med)
 
 def returnAllToOrigin():
@@ -221,6 +225,7 @@ def getPositions():
 def addPipeValves():
     vCtl = Control(pipes)
     vCtl.addControllers('Pipe', 'valve')
+    vCtl.addControllers('Pipe', 'roller')
 
 def addChoirValves():
     vCtl = Control(choirs)
@@ -343,6 +348,10 @@ def createAll():
                         print("creating speed ", control)
                         ctrl = "speedController"
                         color = colors[1]
+                    elif "roller" in control:
+                        print("creating speed ", control)
+                        ctrl = "rollerController"
+                        color = colors[1]
                     else:
                         print("creating controller ", control)
                         ctrl = "otherController"
@@ -407,7 +416,7 @@ def playRandomValve():
     rand = randint(0, len(v))
     v[rand].isActive = True
     v[rand].isDynamic = True
-    v[rand].goTo(Vector(utils.randomPosition()),speed=30, active=True)
+    v[rand].goTo(Vector(utils.randomPosition()),speed=2, active=True)
 
 def tubeLengths():
     vCtl = Control(telescopics)
