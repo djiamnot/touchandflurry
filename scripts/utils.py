@@ -7,7 +7,7 @@ def scale (OldValue, OldMin, OldMax, NewMin, NewMax):
     return NewValue
 
 def randomPosition():
-    x = random() * 8 -4
-    y = random() * 8 -4
+    x = random() * 6 - 3
+    y = random() * 6 - 3
     z = random() * 4
     return [x, y, z]
