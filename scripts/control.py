@@ -4,6 +4,7 @@ import context
 from random import random
 from random import randint
 from mathutils import Vector
+import utils
 
 class Control:
     def __init__(self, controls):
@@ -78,7 +79,7 @@ class Control:
                             c.valveForce = 0.1
                         else:
                             c.valveForce = 0.5
-                            c.nextPosition(speed=30)
+                            c.goTo(Vector(utils.randomPosition()),speed=2, active=True)
                     else:
                         c.isDynamic = True
                         c.chosen = False
@@ -103,9 +104,9 @@ class Control:
                     c.chosen = False
                     #c.active = True
                     c.stopDynamics()
-                    #print(" ~~~~~ returning to: ", c.startingPosition)
-                    #origin = c.startingPosition
-                    #c.goTo(origin, speed=1)
+                    print(" ~~~~~ returning to: ", c.startingPosition)
+                    origin = c.startingPosition
+                    c.goTo(origin, speed=1)
 
     def getControlsByType(self, ctlType):
         """
