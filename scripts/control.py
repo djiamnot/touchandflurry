@@ -15,11 +15,15 @@ class Control:
     def getIntonaData(self):
         return self.context.logic.globalDict['intonaData']        
 
-    def addControllers(self,instrGroup, ctrlType):
+    def addControllers(self,instrGroup, ctrlType, obj):
         """
-        Add some kind of controller. Either valve or other
+        Add a controller to an object as a child.
         groups: Pipe, Tele, Choir
         control types: valve, roller, mute, tirapHoriz, tirapVert, speed, dur, length
+        Arguments:
+        instrGroup: string - name of the group
+        ctrlTye: the type of control
+        obj: a blender object to which a controller should be parented
         """
         family = []
         self.context.updateContext()

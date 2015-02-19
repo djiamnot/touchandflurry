@@ -224,21 +224,21 @@ def getPositions():
 
 def addPipeValves():
     vCtl = Control(pipes)
-    vCtl.addControllers('Pipe', 'valve')
-    vCtl.addControllers('Pipe', 'roller')
+    vCtl.addControllers('Pipe', 'valve', "Forceer")
+    vCtl.addControllers('Pipe', 'roller', "Forceer")
 
 def addChoirValves():
     vCtl = Control(choirs)
-    vCtl.addControllers('Choir', 'valve')
+    vCtl.addControllers('Choir', 'valve', "Forceer")
 
 def addTeleValves():
     vCtl = Control(telescopics)
-    vCtl.addControllers('Tele', 'valve')
+    vCtl.addControllers('Tele', 'valve', "Forceer")
 
 def addPipeMotors():
-    ctl.addControllers('Pipe', 'mute')
-    ctl.addControllers('Pipe', 'roller')
-    ctl.addControllers('Pipe', 'tirap')
+    ctl.addControllers('Pipe', 'mute', "Forceer")
+    ctl.addControllers('Pipe', 'roller', "Forceer")
+    ctl.addControllers('Pipe', 'tirap', "Forceer")
 
 
 def getAmplitudes():
