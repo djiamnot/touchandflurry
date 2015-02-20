@@ -58,6 +58,7 @@ def keyboardCtrl():
         'addchoirs': events.YKEY,
         'origins': events.QKEY,
         'randomvalve': events.ZKEY,
+        'valveOpen': events.MKEY,
     }
     mapping = {
         'boo': removeAllParents, 
@@ -73,6 +74,7 @@ def keyboardCtrl():
         'origins': returnAllToOrigin,
         #'randomvalve': playRandomValve,
         'randomvalve': tubeLengths,
+        'valveOpen': addChoirOpenCtrls
     }
     activeKey = KEYBOARD.active_events
     print(activeKey)
@@ -229,16 +231,25 @@ def addPipeValves():
 
 def addChoirValves():
     vCtl = Control(choirs)
-    vCtl.addControllers('Choir', 'valve', "Forceer")
+    vCtl.addControllers('Choir', 'open', "Forceer")
+    vCtl.addControllers('Choir', 'onoff', "Forceer")
+
+def addChoirOpenCtrls():
+    vCtl = Control(choirs)
+    vCtl.addControllers('Choir', 'speed', 'Forceer')
+    vCtl.addControllers('Choir', 'dur', 'Forceer')
+    #context.scene.objects["openCenter"].worldAngularVelocity = [0.2, 0.2, 2]
+    #[x.goTo(Vector(0, 0.3 , 1)) for x in choirs if 'onoff' in x ]
 
 def addTeleValves():
     vCtl = Control(telescopics)
     vCtl.addControllers('Tele', 'valve', "Forceer")
 
 def addPipeMotors():
-    ctl.addControllers('Pipe', 'mute', "Forceer")
-    ctl.addControllers('Pipe', 'roller', "Forceer")
-    ctl.addControllers('Pipe', 'tirap', "Forceer")
+    vCtl = Control(pipes)
+    vCtl.addControllers('Pipe', 'mute', "Forceer")
+    vCtl.addControllers('Pipe', 'roller', "Forceer")
+    vCtl.addControllers('Pipe', 'tirap', "Forceer")
 
 
 def getAmplitudes():
@@ -391,10 +402,13 @@ def playRandomAction():
 def updatePositions():
     global valves
     intonaData = ctl.getIntonaData()
-    #print("--------------->     piezd:{}      pizm:{}      ir:{}".format(intonaData["piezd"], intonaData["piezm"], intonaData["ir"]))
+    #print("--------------->     piezd:{} pizm:{} ir:{}".format(intonaData["piezd"], intonaData["piezm"], intonaData["ir"]))
     ir = intonaData['ir']
+    # ir = utils.smooth(abs(intonaData['accel_x']))
+    print(" ---> ir", ir)
+    #print(" ---> accel_x smooth", utils.smooth(ir))
     #context.scene.objects["Forceer"].worldPosition.z = ir*0.01
-    context.scene.lights["ShowerLight"].energy = utils.scale(ir*0.001,0.2, 0.8, 0.01, 0.99) 
+    context.scene.lights["ShowerLight"].energy = utils.scale(ir*0.1,0.2, 0.8, 0.01, 0.99) 
     #context.scene.lights["ShowerLight"].color = [intonaData["accel_x"] * 0.01, 0,intonaData["accel_y"] * 0.01 ]
     #print("----------> ", context.scene.lights)
     #posCoeff = scalingFactor * 0.001
@@ -430,7 +444,7 @@ def tubeLengths():
 def updateMediators(collection, ir):
     for mediator in collection:
         mediator.update()
-        mediator.valveForce = utils.scale(ir*0.001,0.2, 0.8, 0.01, 0.99) 
+        mediator.valveForce = utils.scale(ir*0.01,0.2, 0.8, 0.01, 0.99) 
 
 def goTocb(ctl):
     print("goto callback", ctl)

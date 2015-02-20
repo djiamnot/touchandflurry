@@ -80,7 +80,16 @@ class Mediator(bge.types.KX_GameObject):
         self.setAlpha(normalizedPosition)
         if self.isDynamic and self.active:
             #print("{}'s velocity: {}, normalized position: {}".format(self.oscurl, veloSum, normalizedPosition));
-            liblo.send(self.oscaddress, self.oscurl, normalizedPosition)
+            if 'onoff' in self.control:
+                onoff = 0
+                if normalizedPosition > 0:
+                    onoff = int(2)
+                else:
+                    onoff = 0
+                print("---- found on/off, position:",onoff )
+                liblo.send(self.oscaddress, self.oscurl, onoff)
+            else: 
+                liblo.send(self.oscaddress, self.oscurl, normalizedPosition)
         else:
             if 'valve' in self.control:
                 liblo.send(self.oscaddress, self.oscurl, 0)

@@ -53,7 +53,7 @@ class Control:
                 #     family[control].setParent("Forceer")
                 #     family[control].isDynamic = True
                 for f in family:
-                    f.setParent("Forceer")
+                    f.setParent(obj)
                     f.isDynamic = True
                     f.active = True
                     if 'C2' in f.oscurl:
