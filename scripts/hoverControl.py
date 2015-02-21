@@ -24,7 +24,10 @@ from control import Control
 import utils
 
 ticker = Ticker(context.scene.addObject("ticker", "tickerOrigin"))
-#context.scene.objects["tickerOrigin"].worldPosition = [-1.0, 1.0, 1.0]
+ticker.localOrientation = [math.radians(90), math.radians(0), math.radians(0)]
+ticker.localPosition = [-8.0, 0.0, 9.9]
+ticker.localScale = [0.4, 0.4, 0.4]
+#context.scene.objects["tickerOrigin"].worldPosition = [0.0, 0.0, 1.0]
 
 ALPHA = 1.0
 
@@ -404,7 +407,8 @@ def playRandomAction():
 
 def updatePositions():
     global valves, ticker
-    #ticker.update()
+    ticker.update()
+    sequence()
     intonaData = ctl.getIntonaData()
     #print("--------------->     piezd:{} pizm:{} ir:{}".format(intonaData["piezd"], intonaData["piezm"], intonaData["ir"]))
     ir = intonaData['ir']
@@ -428,6 +432,50 @@ def updatePositions():
     #             i.startDynamics()
     #         else:
     #             i.stopDynamics()
+
+timeMarkers = [1.2, 15.3, 17.7, 20.00]
+event = 0            
+def sequence():
+    global event
+    print("-----> before ", event)
+    t = context.scene.objects["ticker"].elapsedTime
+    print("--> elapsed time", t)
+    if event < len(timeMarkers):
+        if t > timeMarkers[event]:
+            if event is 0:
+                print("********** first event *****************")
+                telescopicMotors()
+                event += 1
+            elif event is 1:
+                print("********** second event *****************")
+                #telescopicMotors()
+                event += 1
+            elif event is 2:
+                print("********** third event *****************")
+                #telescopicMotors()
+                event += 1
+            elif event is 3:
+                returnAllToOrigin()
+                event += 1
+            else:
+                event += 10
+            print("-----> after", event)
+    else:
+        print("********** FINISHED *****************")
+        #telescopicMotors()
+        context.scene.end()
+
+
+# first event
+def telescopicMotors():
+    addTelescopics()
+    c = Control(telescopics)
+    s = c.getControlsByType("speed")
+    for controller in s:
+        controller.worldPosition = [random()* 0.2 - 0.5, random(), random()]
+    c.addControllers("Tele", "length", "Forceer")
+
+            
 def playRandomValve():
     vCtl = Control(choirs)
     v = vCtl.getControlsByType("valve");
