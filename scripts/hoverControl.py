@@ -18,10 +18,13 @@ sys.path.append(SCRIPTS_PATH)
 #print(os.path.join(logic.expandPath('//'), 'scripts'))
 import config
 import context
+from ticker import Ticker
 from mediator import Mediator
 from control import Control
 import utils
 
+ticker = Ticker(context.scene.addObject("ticker", "tickerOrigin"))
+#context.scene.objects["tickerOrigin"].worldPosition = [-1.0, 1.0, 1.0]
 
 ALPHA = 1.0
 
@@ -400,7 +403,8 @@ def playRandomAction():
         picked.playAction("PipeLvalveH", randint(0,100), randint(150, 250), speed=(random()*10))
 
 def updatePositions():
-    global valves
+    global valves, ticker
+    #ticker.update()
     intonaData = ctl.getIntonaData()
     #print("--------------->     piezd:{} pizm:{} ir:{}".format(intonaData["piezd"], intonaData["piezm"], intonaData["ir"]))
     ir = intonaData['ir']
@@ -408,7 +412,7 @@ def updatePositions():
     print(" ---> ir", ir)
     #print(" ---> accel_x smooth", utils.smooth(ir))
     #context.scene.objects["Forceer"].worldPosition.z = ir*0.01
-    context.scene.lights["ShowerLight"].energy = utils.scale(ir*0.1,0.2, 0.8, 0.01, 0.99) 
+    context.scene.lights["ShowerLight"].energy = utils.scale(ir*0.001,0.2, 0.8, 0.01, 0.99) 
     #context.scene.lights["ShowerLight"].color = [intonaData["accel_x"] * 0.01, 0,intonaData["accel_y"] * 0.01 ]
     #print("----------> ", context.scene.lights)
     #posCoeff = scalingFactor * 0.001
@@ -442,9 +446,14 @@ def tubeLengths():
         i.isDynamic = True
 
 def updateMediators(collection, ir):
-    for mediator in collection:
-        mediator.update()
-        mediator.valveForce = utils.scale(ir*0.01,0.2, 0.8, 0.01, 0.99) 
+    [handleMediator(mediator, ir) for mediator in collection]
+    # for mediator in collection:
+    #     mediator.update()
+    #     mediator.valveForce = utils.scale(ir*0.001,0.2, 0.8, 0.01, 0.99) 
+
+def handleMediator(obj, ir):
+    obj.update()
+    obj.valveForce = utils.scale(ir*0.001,0.2, 0.8, 0.01, 0.99) 
 
 def goTocb(ctl):
     print("goto callback", ctl)
