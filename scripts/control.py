@@ -93,11 +93,19 @@ class Control:
         self.context.updateContext()
         if self.context.isSensorPositive():
             if len(collection) > 0:
-                for c in collection:
-                    c.removeParent()
-                    c.chosen = False
-                    c.active = False
-                    c.stopDynamics()
+                [self.removeAndSilence(c) for c in collection]
+
+    def removeAndSilence(self, obj):
+        """
+        Remove object from parent and reset its state to 0
+        """
+        obj.removeParent()
+        obj.chosen = False
+        obj.active = False
+        obj.isDynamic = False
+        obj.stopDynamics()
+        if 'onoff' in obj.control :
+            obj.valveForce = 0
 
     def returnToOrigin(self):
         self.context.updateContext()
