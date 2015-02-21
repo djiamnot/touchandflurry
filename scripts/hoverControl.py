@@ -449,6 +449,7 @@ def sequence():
             elif event is 1:
                 print("********** second event *****************")
                 #telescopicMotors()
+                endObjects(telescopics)
                 event += 1
             elif event is 2:
                 print("********** third event *****************")
@@ -465,7 +466,6 @@ def sequence():
         #telescopicMotors()
         context.scene.end()
 
-
 # first event
 def telescopicMotors():
     addTelescopics()
@@ -473,8 +473,13 @@ def telescopicMotors():
     s = c.getControlsByType("speed")
     for controller in s:
         controller.worldPosition = [random()* 0.2 - 0.5, random(), random()]
+        controller.isActive = True
+        controller.isDynamic = True
     c.addControllers("Tele", "length", "Forceer")
 
+def endObjects(obj):
+    [o.endObject() for o in obj]
+    
             
 def playRandomValve():
     vCtl = Control(choirs)
