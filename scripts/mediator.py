@@ -61,24 +61,25 @@ class Mediator(bge.types.KX_GameObject):
         self.curScene = bge.logic.getCurrentScene()
 
     def getFloorPosition(self):
-        self.updateContext()
-        position = self.worldPosition
-        floorPosition = self.curScene.objects["Floor"].worldTransform
-        invertedPosition = floorPosition.inverted()
-        objPosition = invertedPosition * position
-        return objPosition
+        if self.isDynamic and self.active:
+            self.updateContext()
+            position = self.worldPosition
+            floorPosition = self.curScene.objects["Floor"].worldTransform
+            invertedPosition = floorPosition.inverted()
+            objPosition = invertedPosition * position
+            return objPosition
 
     def sendPosition(self):
-        velocityVector = self.getLinearVelocity()
-        veloSum = sum(velocityVector)
-        position = self.getFloorPosition()
-        #normalizedPosition = self.invert(abs(position.x)) * self.valveForce
-        if 'C2' in self.oscurl:
-            normalizedPosition = self.invert(abs(position.x)) * self.valveForce * 0.2
-        else:
-            normalizedPosition = self.invert(abs(position.x)) * self.valveForce
-        self.setAlpha(normalizedPosition)
         if self.isDynamic and self.active:
+            velocityVector = self.getLinearVelocity()
+            veloSum = sum(velocityVector)
+            position = self.getFloorPosition()
+            #normalizedPosition = self.invert(abs(position.x)) * self.valveForce
+            if 'C2' in self.oscurl:
+                normalizedPosition = self.invert(abs(position.x)) * self.valveForce * 0.2
+            else:
+                normalizedPosition = self.invert(abs(position.x)) * self.valveForce
+                self.setAlpha(normalizedPosition)
             #print("{}'s velocity: {}, normalized position: {}".format(self.oscurl, veloSum, normalizedPosition));
             if 'onoff' in self.control:
                 onoff = 0
@@ -86,12 +87,13 @@ class Mediator(bge.types.KX_GameObject):
                     onoff = int(2)
                 else:
                     onoff = 0
-                print("---- found on/off, position:",onoff )
                 liblo.send(self.oscaddress, self.oscurl, onoff)
             else: 
                 liblo.send(self.oscaddress, self.oscurl, normalizedPosition)
         else:
             if 'valve' in self.control:
+                liblo.send(self.oscaddress, self.oscurl, 0)
+            elif 'onoff' in self.control:
                 liblo.send(self.oscaddress, self.oscurl, 0)
             else:
                 self.active = False
