@@ -5,8 +5,8 @@ from random import random
 
 class Mediator(bge.types.KX_GameObject):
     def __init__ (self, old_owner):
-        self.oscaddress = liblo.Address("192.168.0.20", 8188)
-        #self.oscaddress = liblo.Address("localhost", 8188)
+        #self.oscaddress = liblo.Address("192.168.0.20", 8188)
+        self.oscaddress = liblo.Address("localhost", 8188)
         self.startingPosition = Vector((0.0, 0.0, 0.0))
         self.cont = bge.logic.getCurrentController()
         self.obj = self.cont.owner
@@ -18,6 +18,7 @@ class Mediator(bge.types.KX_GameObject):
         self.group = None
         self.isDynamic = False
         self.active = False
+        self.forceAffected = True
         self.alpha = self.color[3]
         self.moving = False
         self.chosen = False
@@ -76,9 +77,9 @@ class Mediator(bge.types.KX_GameObject):
             position = self.getFloorPosition()
             #normalizedPosition = self.invert(abs(position.x)) * self.valveForce
             if 'C2' in self.oscurl:
-                normalizedPosition = self.invert(abs(position.x)) * self.valveForce * 0.2
+                normalizedPosition = self.invert(abs(position.x)) * self.forceInfluence() * 0.2
             else:
-                normalizedPosition = self.invert(abs(position.x)) * self.valveForce
+                normalizedPosition = self.invert(abs(position.x)) * self.forceInfluence()
                 self.setAlpha(normalizedPosition)
             #print("{}'s velocity: {}, normalized position: {}".format(self.oscurl, veloSum, normalizedPosition));
             if 'onoff' in self.control:
@@ -97,6 +98,12 @@ class Mediator(bge.types.KX_GameObject):
                 liblo.send(self.oscaddress, self.oscurl, 0)
             else:
                 self.active = False
+
+    def forceInfluence(self):
+        if self.forceAffected is True:
+            return self.valveForce
+        else:
+            return 1
 
     def moveTo(self, vector):
         print("-=-=-=-=- moving {} to {}".format(self.id, vector))
