@@ -443,42 +443,50 @@ def updatePositions():
 
 timeMarkers = [1.2, 2.3, 15.2, 30.7, 590.0, 720.0]
 event = 0
+
+
+def zero():
+    print("================= zero")
+    telescopicMotors()
+def one():
+    print("= ==== = ====== = =one")
+    telescopicMotorsControlsStop
+    flutesAction()
+def two():
+    print(" = = == ======= == == ===== two")
+    telescopicValves()
+def three():
+    print("======= ========= ========== three")
+
+def four():
+    print("=  =  = === == == =======four")
+    returnAllToOrigin()
+def five():
+    print("=  =  = === == == =======four")
+    endObjects(telescopics)
+
+eventMap = {
+    0: zero,
+    1: one, 
+    2: two,
+    3: three,
+    4: four,
+    5: five
+}
+
+
 def sequence():
     global event
-    #print("-----> before ", event)
     t = context.scene.objects["ticker"].elapsedTime
-    #print("--> elapsed time", t)
-    if event < len(timeMarkers):
-        if t > timeMarkers[event]:
-            if event is 0:
-                print("********** first event *****************")
-                telescopicMotors()
+    #print(" --> elapsed time", t)
+    for idx, mark in enumerate(timeMarkers):
+        if t > mark:
+            #print("  |--> mark Passed", mark)
+            #print("   event at index", idx, eventMap[idx])
+            if idx == event:
+                print("********** event {} *****************".format(event))
+                eventMap[idx]()
                 event += 1
-            elif event is 1:
-                print("********** second event *****************")
-                telescopicMotorsControlsStop
-
-                flutesAction()
-                #telescopicMotors()
-                event += 1
-            elif event is 2:
-                telescopicValves()
-                print("********** third event *****************")
-                #telescopicMotors()
-                event += 1
-            elif event is 3:
-                event += 1
-            elif event is 4:
-                returnAllToOrigin()
-                endObjects(telescopics)
-                event += 1
-            else:
-                event += 10
-            #print("-----> after", event)
-    else:
-        print("********** FINISHED *****************")
-        #telescopicMotors()
-        context.scene.end()
 
 # first event
 def telescopicMotors():
