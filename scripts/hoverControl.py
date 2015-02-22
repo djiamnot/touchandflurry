@@ -202,6 +202,14 @@ def populateControls(family, array):
                             print("creating roller ", control)
                             ctrl = "rollerController"
                             color = colors[1]
+                        elif "length" in control:
+                            print("creating roller ", control)
+                            ctrl = "lengthController"
+                            color = colors[2]
+                        elif "dur" in control:
+                            print("creating roller ", control)
+                            ctrl = "lengthController"
+                            color = colors[1]
                         else:
                             print("creating controller ", control)
                             ctrl = "otherController"
@@ -413,7 +421,7 @@ def updatePositions():
     #print("--------------->     piezd:{} pizm:{} ir:{}".format(intonaData["piezd"], intonaData["piezm"], intonaData["ir"]))
     ir = intonaData['ir']
     # ir = utils.smooth(abs(intonaData['accel_x']))
-    print(" ---> ir", ir)
+    #print(" ---> ir", ir)
     #print(" ---> accel_x smooth", utils.smooth(ir))
     #context.scene.objects["Forceer"].worldPosition.z = ir*0.01
     context.scene.lights["ShowerLight"].energy = utils.scale(ir*0.001,0.2, 0.8, 0.01, 0.99) 
@@ -433,13 +441,13 @@ def updatePositions():
     #         else:
     #             i.stopDynamics()
 
-timeMarkers = [1.2, 15.3, 17.7, 59.0, 60.0]
-event = 0            
+timeMarkers = [1.2, 2.3, 15.2, 30.7, 590.0, 720.0]
+event = 0
 def sequence():
     global event
-    print("-----> before ", event)
+    #print("-----> before ", event)
     t = context.scene.objects["ticker"].elapsedTime
-    print("--> elapsed time", t)
+    #print("--> elapsed time", t)
     if event < len(timeMarkers):
         if t > timeMarkers[event]:
             if event is 0:
@@ -448,21 +456,25 @@ def sequence():
                 event += 1
             elif event is 1:
                 print("********** second event *****************")
+                telescopicMotorsControlsStop
+
+                flutesAction()
                 #telescopicMotors()
                 event += 1
             elif event is 2:
+                telescopicValves()
                 print("********** third event *****************")
-                returnAllToOrigin()
                 #telescopicMotors()
                 event += 1
             elif event is 3:
-                endObjects(telescopics)
                 event += 1
             elif event is 4:
+                returnAllToOrigin()
+                endObjects(telescopics)
                 event += 1
             else:
                 event += 10
-            print("-----> after", event)
+            #print("-----> after", event)
     else:
         print("********** FINISHED *****************")
         #telescopicMotors()
@@ -472,12 +484,62 @@ def sequence():
 def telescopicMotors():
     addTelescopics()
     c = Control(telescopics)
+    c.addControllers("Tele", "speed", "Forceer")
     s = c.getControlsByType("speed")
-    for controller in s:
-        controller.worldPosition = [random()* 0.2 - 0.5, random(), random()]
-        controller.isActive = True
-        controller.isDynamic = True
+    for speed in s:
+        #controller.worldPosition = [random()* 0.2 - 0.5, random(), random()]
+        speed.active = True
+        speed.isDynamic = True
+        speed.forceAffected = False
+        position = utils.randomPosition()
+        speed.goTo(Vector((position[0]*0.1, position[1], position[2])), speed=1, active=True)
     c.addControllers("Tele", "length", "Forceer")
+    ln = c.getControlsByType("length")
+    for l in ln:
+        l.forceAffected = False
+
+def telescopicMotorsControlsStop():
+    c = Control(telescopics)
+    s = c.getControlsByType("speed")
+    l = c.getControlsByType("length")
+    s.active = False
+    s.isDynamic = False
+    l.active = False
+    l.isDynamic = False
+
+def telescopicValves():
+    c = Control(telescopics)
+    c.addControllers("Tele", "valve", "Forceer")
+
+def flutesAction():
+    addChoirs()
+    c = Control(choirs)
+    c.addControllers("Choir", "speed", "Forceer")
+    c.addControllers("Choir", "dur", "Forceer")
+    c.addControllers("Choir", "onoff", "Forceer")
+    c.addControllers("Choir", "open", "Forceer")
+    s = c.getControlsByType("speed")
+    for speed in s:
+        speed.active = True
+        speed.isDynamic = True
+        speed.forceAffected = False
+        position = utils.randomPosition()
+        speed.goTo(Vector((position[0]*3, position[1]*3, position[2])), speed=30, active=True)
+        #speed.startDynamics()
+    d = c.getControlsByType("dur")
+    for duration in d:
+        duration.active = True
+        duration.isDynamic = True
+        duration.forceAffected = False
+        position = utils.randomPosition()
+        duration.goTo(Vector((position[0]*10+1, position[1]*10+1, position[2])), speed=10, active=True)
+    o = c.getControlsByType("onoff")
+    for pulse in o:
+        pulse.active = True
+        pulse.isDynamic = True
+        pulse.forceAffected = False
+        position = utils.randomPosition()
+        pulse.goTo(Vector((0.0, position[1], position[2])), speed=20, active=True)
 
 def endObjects(obj):
     [o.endObject() for o in obj]
