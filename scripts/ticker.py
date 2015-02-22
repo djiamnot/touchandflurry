@@ -24,7 +24,7 @@ class Ticker(bge.types.KX_FontObject):
         #return (self.elapsedTime)
         
     def moveTo(self, vector):
-        print("-=-=-=-=- ticker going to {}".format(vector))
+        #print("-=-=-=-=- ticker going to {}".format(vector))
         self.localPosition = vector
         self.currentPosition = vector
 
@@ -55,4 +55,4 @@ class Ticker(bge.types.KX_FontObject):
         
     def update(self):
         self.step(Vector((0.0001, 0, 0)))
-        print("----> current position", self.localPosition)
+        #print("----> current position", self.localPosition)
