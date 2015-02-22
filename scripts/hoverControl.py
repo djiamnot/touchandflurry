@@ -433,7 +433,7 @@ def updatePositions():
     #         else:
     #             i.stopDynamics()
 
-timeMarkers = [1.2, 15.3, 17.7, 20.00]
+timeMarkers = [1.2, 15.3, 17.7, 59.0, 60.0]
 event = 0            
 def sequence():
     global event
@@ -449,14 +449,16 @@ def sequence():
             elif event is 1:
                 print("********** second event *****************")
                 #telescopicMotors()
-                endObjects(telescopics)
                 event += 1
             elif event is 2:
                 print("********** third event *****************")
+                returnAllToOrigin()
                 #telescopicMotors()
                 event += 1
             elif event is 3:
-                returnAllToOrigin()
+                endObjects(telescopics)
+                event += 1
+            elif event is 4:
                 event += 1
             else:
                 event += 10

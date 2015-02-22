@@ -40,7 +40,7 @@ class Ticker(bge.types.KX_FontObject):
         #self.text = "{0:0.3}".format(self.currentPosition[0])
         #self.text = self.updateSign()
         self.updateTime()
-        self.text = "{:02}".format(self.elapsedTime)
+        self.text = "{:3.2f}".format(self.elapsedTime)
         
     def updateSign(self):
         # ret = None
@@ -54,5 +54,5 @@ class Ticker(bge.types.KX_FontObject):
         
         
     def update(self):
-        self.step(Vector((0.001, 0, 0)))
+        self.step(Vector((0.0001, 0, 0)))
         print("----> current position", self.localPosition)
