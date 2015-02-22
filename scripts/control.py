@@ -122,7 +122,11 @@ class Control:
 
     def getControlsByType(self, ctlType):
         """
-        @param: control type (valve, speed, length etc...)
+        get controls by type 
+        Args:
+        ctlType: control type (valve, speed, length etc...)
+        return:
+        an array of control objects
         """
         valves = []
         self.context.updateContext()
