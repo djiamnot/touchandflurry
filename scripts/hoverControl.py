@@ -28,6 +28,11 @@ ticker.localOrientation = [math.radians(90), math.radians(0), math.radians(0)]
 ticker.localPosition = [-8.0, 0.0, 9.9]
 ticker.localScale = [0.4, 0.4, 0.4]
 #context.scene.objects["tickerOrigin"].worldPosition = [0.0, 0.0, 1.0]
+sectionText = context.scene.addObject("sectionText", "tickerOrigin")
+sectionText.localOrientation = [math.radians(90), math.radians(0), math.radians(0)]
+sectionText.localPosition = [8.0, 0.0, 9.9]
+sectionText.localScale = [0.4, 0.4, 0.4]
+sectionText.color = [0.9, 0.3, 0.3, 0.5]
 
 ALPHA = 1.0
 
@@ -241,7 +246,7 @@ def getPositions():
 def addPipeValves():
     vCtl = Control(pipes)
     vCtl.addControllers('Pipe', 'valve', "Forceer")
-    vCtl.addControllers('Pipe', 'roller', "Forceer")
+    #vCtl.addControllers('Pipe', 'roller', "Forceer")
 
 def addChoirValves():
     vCtl = Control(choirs)
@@ -417,14 +422,22 @@ def updatePositions():
     global valves, ticker
     ticker.update()
     sequence()
+    piezosAction()
     intonaData = ctl.getIntonaData()
     #print("--------------->     piezd:{} pizm:{} ir:{}".format(intonaData["piezd"], intonaData["piezm"], intonaData["ir"]))
     ir = intonaData['ir']
+    #piezd = intonaData['piezd']
+    #piezm = intonaData['piezm']
+    #print("----> Piezos d:{:0.2f} m:{:0.2f}".format(piezd, piezm))
     # ir = utils.smooth(abs(intonaData['accel_x']))
     #print(" ---> ir", ir)
     #print(" ---> accel_x smooth", utils.smooth(ir))
     #context.scene.objects["Forceer"].worldPosition.z = ir*0.01
     context.scene.lights["ShowerLight"].energy = utils.scale(ir*0.001,0.2, 0.8, 0.01, 0.99) 
+    if piezoTriggered:
+        context.scene.lights["distanceLamp"].energy = 3.5
+    else:
+        context.scene.lights["distanceLamp"].energy = 0.0
     #context.scene.lights["ShowerLight"].color = [intonaData["accel_x"] * 0.01, 0,intonaData["accel_y"] * 0.01 ]
     #print("----------> ", context.scene.lights)
     #posCoeff = scalingFactor * 0.001
@@ -441,28 +454,43 @@ def updatePositions():
     #         else:
     #             i.stopDynamics()
 
-timeMarkers = [1.2, 2.3, 15.2, 30.7, 590.0, 720.0]
+timeMarkers = [1.2, 2.3, 35.2, 55.7, 590.0, 720.0]
 event = 0
-
+piezoTriggered = False
 
 def zero():
     print("================= zero")
     telescopicMotors()
 def one():
     print("= ==== = ====== = =one")
-    telescopicMotorsControlsStop
+    telescopicMotorsControlsStop()
     flutesAction()
 def two():
     print(" = = == ======= == == ===== two")
     telescopicValves()
 def three():
-    print("======= ========= ========== three")
-
+    print("======= ========= ========== {}".format(event))
+    pipesStageone()
 def four():
-    print("=  =  = === == == =======four")
+    print("======= ========= ========== {}".format(event))
     returnAllToOrigin()
 def five():
-    print("=  =  = === == == =======four")
+    print("======= ========= ========== {}".format(event))        
+def six():
+    print("======= ========= ========== {}".format(event))
+    
+def seven():
+    print("======= ========= ========== {}".format(event))
+    
+def eight():
+    print("======= ========= ========== {}".format(event))
+    
+def nine():
+    print("======= ========= ========== {}".format(event))
+    endObjects(telescopics)
+
+def ten():
+    print("======= ========= ========== {}".format(event))
     endObjects(telescopics)
 
 eventMap = {
@@ -471,12 +499,17 @@ eventMap = {
     2: two,
     3: three,
     4: four,
-    5: five
+    5: five,
+    6: six,
+    7: seven,
+    8: eight,
+    9: nine,
+    10: ten,
 }
 
 
 def sequence():
-    global event
+    global event, sectionText
     t = context.scene.objects["ticker"].elapsedTime
     #print(" --> elapsed time", t)
     for idx, mark in enumerate(timeMarkers):
@@ -486,34 +519,94 @@ def sequence():
             if idx == event:
                 print("********** event {} *****************".format(event))
                 eventMap[idx]()
+                sectionText.text = "{}".format(event)
                 event += 1
+
+def piezosAction():
+    global piezoTriggered
+    intonaData = ctl.getIntonaData()
+    piezd = intonaData['piezd']
+    piezm = intonaData['piezm']
+    print("-=-=-=-=-=- > piezd:{0:0.2f} piezm:{0:0.2f}".format(piezd, piezm))
+    if event == 2:
+        if piezd > 90:
+            print("!!!! Piezo spike", piezd)
+            if not piezoTriggered:
+                dynamicChoirSpeed()
+            else:
+                removeChoirSpeedDynamics()
+
+def dynamicChoirSpeed():
+    global piezoTriggered
+    intonaData = ctl.getIntonaData()
+    accelx = intonaData['accel_x'] * 0.001
+    accely = intonaData['accel_y'] * 0.001
+    accelz = intonaData['accel_z'] * 0.001
+    c = Control(choirs)
+    s = c.getControlsByType("speed")
+    for speed in s:
+        speed.active = True
+        speed.isDynamic = True
+        speed.forceAffected = False
+        speed.removeParent()
+        speed.startDynamics()
+        speed.localLinearVelocity = [accelx, accely, accelz]
+        piezoTriggered = True
+    
+def removeChoirSpeedDynamics():
+    global piezoTriggered
+    intonaData = ctl.getIntonaData()
+    c = Control(choirs)
+    s = c.getControlsByType("speed")
+    for speed in s:
+        speed.stopDynamics()
+        speed.setParent("Forceer")
+        piezoTriggered = False
+   
+def pipesStageone():
+    addPipes()
+    c = Control(pipes)
+    valves = c.getControlsByType("valve")
+    def pipeArrived():
+        print("################# PIPE ARRIVED ########################")
+    for v in valves:
+        v.active = True
+        v.isDynamic = True
+        position = utils.randomPosition()
+        v.goTo(Vector((position[0]*3, position[1]*3, position[2])), speed=60, active=True, callback=pipeArrived)
 
 # first event
 def telescopicMotors():
     addTelescopics()
-    c = Control(telescopics)
-    c.addControllers("Tele", "speed", "Forceer")
-    s = c.getControlsByType("speed")
-    for speed in s:
-        #controller.worldPosition = [random()* 0.2 - 0.5, random(), random()]
-        speed.active = True
-        speed.isDynamic = True
-        speed.forceAffected = False
-        position = utils.randomPosition()
-        speed.goTo(Vector((position[0]*0.1, position[1], position[2])), speed=1, active=True)
-    c.addControllers("Tele", "length", "Forceer")
-    ln = c.getControlsByType("length")
-    for l in ln:
-        l.forceAffected = False
+    # c = Control(telescopics)
+    # c.addControllers("Tele", "speed", "Forceer")
+    # s = c.getControlsByType("speed")
+    # for speed in s:
+    #     #controller.worldPosition = [random()* 0.2 - 0.5, random(), random()]
+    #     speed.active = True
+    #     speed.isDynamic = True
+    #     speed.forceAffected = False
+    #     position = utils.randomPosition()
+    #     speed.goTo(Vector((position[0]*0.1, position[1], position[2])), speed=1, active=True)
+    # c.addControllers("Tele", "length", "Forceer")
+    # ln = c.getControlsByType("length")
+    # for l in ln:
+    #     l.forceAffected = False
 
 def telescopicMotorsControlsStop():
     c = Control(telescopics)
     s = c.getControlsByType("speed")
     l = c.getControlsByType("length")
-    s.active = False
-    s.isDynamic = False
-    l.active = False
-    l.isDynamic = False
+    #print("********* >", s)
+    #print("********* >", l)
+    for ctl in s:
+        ctl.active = False
+        ctl.isDynamic = False
+        ctl.removeParent()
+    for ctl in l:
+        ctl.active = False
+        ctl.isDynamic = False
+        ctl.removeParent()
 
 def telescopicValves():
     c = Control(telescopics)
