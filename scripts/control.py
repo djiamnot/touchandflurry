@@ -8,7 +8,7 @@ import utils
 
 class Control:
     def __init__(self, controls):
-        print("control class with", controls)
+        #print("control class with", controls)
         self.context = context
         self.controls = controls
 
@@ -134,6 +134,6 @@ class Control:
             if len(self.controls) > 0:
                 for c in self.controls:
                     if ctlType in c.control:
-                        print("Found valve", c.control)
+                        #print("Found valve", c.control)
                         valves.append(c)
         return valves
