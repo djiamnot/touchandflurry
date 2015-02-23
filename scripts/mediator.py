@@ -76,7 +76,7 @@ class Mediator(bge.types.KX_GameObject):
             veloSum = sum(velocityVector)
             position = self.getFloorPosition()
             #normalizedPosition = self.invert(abs(position.x)) * self.valveForce
-            if 'C2' in self.oscurl:
+            if 'C3' in self.oscurl:
                 normalizedPosition = self.invert(abs(position.x)) * self.forceInfluence() * 0.2
             else:
                 normalizedPosition = self.invert(abs(position.x)) * self.forceInfluence()
