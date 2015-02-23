@@ -566,6 +566,7 @@ def removeChoirSpeedDynamics():
 def pipesStageone():
     addPipes()
     c = Control(pipes)
+    c.addControllers("Pipe", )
     valves = c.getControlsByType("valve")
     def pipeArrived():
         print("################# PIPE ARRIVED ########################")
@@ -574,6 +575,8 @@ def pipesStageone():
         v.isDynamic = True
         position = utils.randomPosition()
         v.goTo(Vector((position[0]*3, position[1]*3, position[2])), speed=60, active=True, callback=pipeArrived)
+
+    
 
 # first event
 def telescopicMotors():
