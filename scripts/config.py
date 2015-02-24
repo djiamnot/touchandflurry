@@ -18,8 +18,8 @@ valves = ['/ThePipeL/valve/x',
           '/C2V6/valve/x',
           '/C2V7/valve/x',
           '/C2V8/valve/x',
-          '/C2V9/valve/x',
-          '/C2V10/valve/x',
+          #'/C2V9/valve/x',
+          #'/C2V10/valve/x',
           '/C3V1/valve/x',
           '/C3V2/valve/x',
           '/C3V3/valve/x',
@@ -51,7 +51,7 @@ Tele = {
 }
 
 Choir = {
-    'instruments': ['C1V1','C1V2','C1V3','C1V4','C1V5','C1V6','C1V7','C1V8','C1V9','C1V10','C2V1','C2V2','C2V3','C2V4','C2V5','C2V6','C2V7','C2V8','C2V9','C2V10','C3V1','C3V3','C3V3','C3V4','C3V5','C3V6','C3V7','C3V8','C3V9','C2V10'],
+    'instruments': ['C1V1','C1V2','C1V3','C1V4','C1V5','C1V6','C1V7','C1V8','C1V9','C1V10','C2V1','C2V2','C2V3','C2V4','C2V5','C2V6','C2V7','C2V8','C3V1','C3V3','C3V3','C3V4','C3V5','C3V6','C3V7','C3V8','C3V9','C2V10'],
     'controls': ['valve/x', 'speed/x', 'dur/x', 'onoff/x', 'open/x']
 }
 
