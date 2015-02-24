@@ -430,7 +430,7 @@ def updatePositions():
     #piezm = intonaData['piezm']
     #print("----> Piezos d:{:0.2f} m:{:0.2f}".format(piezd, piezm))
     # ir = utils.smooth(abs(intonaData['accel_x']))
-    #print(" ---> ir", ir)
+    print(" ---> ir", ir)
     #print(" ---> accel_x smooth", utils.smooth(ir))
     #context.scene.objects["Forceer"].worldPosition.z = ir*0.01
     context.scene.lights["ShowerLight"].energy = utils.scale(ir*0.001,0.2, 0.8, 0.01, 0.99) 
@@ -529,7 +529,7 @@ def piezosAction():
     piezm = intonaData['piezm']
     print("-=-=-=-=-=- > piezd:{0:0.2f} piezm:{0:0.2f}".format(piezd, piezm))
     if event == 2:
-        if piezd > 90:
+        if piezd > 160:
             print("!!!! Piezo spike", piezd)
             if not piezoTriggered:
                 dynamicChoirSpeed()
@@ -566,7 +566,7 @@ def removeChoirSpeedDynamics():
 def pipesStageone():
     addPipes()
     c = Control(pipes)
-    c.addControllers("Pipe", )
+    c.addControllers("Pipe", "valve", "Forceer")
     valves = c.getControlsByType("valve")
     def pipeArrived():
         print("################# PIPE ARRIVED ########################")
@@ -575,6 +575,7 @@ def pipesStageone():
         v.isDynamic = True
         position = utils.randomPosition()
         v.goTo(Vector((position[0]*3, position[1]*3, position[2])), speed=60, active=True, callback=pipeArrived)
+        v.setParent("Forceer")
 
     
 
