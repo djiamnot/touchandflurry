@@ -1,3 +1,4 @@
+import liblo
 import math
 import os
 import sys
@@ -23,14 +24,16 @@ from mediator import Mediator
 from control import Control
 import utils
 
+oneShotAddress = liblo.Address("localhost", 8188)
+
 ticker = Ticker(context.scene.addObject("ticker", "tickerOrigin"))
 ticker.localOrientation = [math.radians(90), math.radians(0), math.radians(0)]
-ticker.localPosition = [-8.0, 0.0, 9.9]
+ticker.localPosition = [-8.0, 0.0, 10.6]
 ticker.localScale = [0.4, 0.4, 0.4]
 #context.scene.objects["tickerOrigin"].worldPosition = [0.0, 0.0, 1.0]
 sectionText = context.scene.addObject("sectionText", "tickerOrigin")
 sectionText.localOrientation = [math.radians(90), math.radians(0), math.radians(0)]
-sectionText.localPosition = [8.0, 0.0, 9.9]
+sectionText.localPosition = [8.0, 0.0, 10.6]
 sectionText.localScale = [0.4, 0.4, 0.4]
 sectionText.color = [0.9, 0.3, 0.3, 0.5]
 
@@ -196,9 +199,13 @@ def populateControls(family, array):
                         control = control
                         oscurl = os.path.join("/", name, control)
                         if "valve" in control:
-                            print("creating valve ", control)
-                            ctrl = "valveController"
-                            color = colors[0]
+                            if 'Pipe' in oscurl:
+                                ctrl = "pipeValve"
+                                color = colors[0]
+                            else:
+                                print("creating valve ", control)
+                                ctrl = "valveController"
+                                color = colors[0]
                         elif "speed" in control:
                             print("creating speed ", control)
                             ctrl = "speedController"
@@ -454,7 +461,7 @@ def updatePositions():
     #         else:
     #             i.stopDynamics()
 
-timeMarkers = [1.2, 2.3, 35.2, 55.7, 590.0, 720.0]
+timeMarkers = [1.2, 2.3, 35.2, 55.7, 62.0, 590.0, 720.0]
 event = 0
 piezoTriggered = False
 
@@ -470,12 +477,13 @@ def two():
     telescopicValves()
 def three():
     print("======= ========= ========== {}".format(event))
-    pipesStageone()
+    pipesStageOne()
 def four():
     print("======= ========= ========== {}".format(event))
-    returnAllToOrigin()
+    pipesStageTwo()
 def five():
     print("======= ========= ========== {}".format(event))        
+    returnAllToOrigin()
 def six():
     print("======= ========= ========== {}".format(event))
     
@@ -529,7 +537,7 @@ def piezosAction():
     piezm = intonaData['piezm']
     print("-=-=-=-=-=- > piezd:{0:0.2f} piezm:{0:0.2f}".format(piezd, piezm))
     if event == 2:
-        if piezd > 160:
+        if piezd > 140:
             print("!!!! Piezo spike", piezd)
             if not piezoTriggered:
                 dynamicChoirSpeed()
@@ -563,7 +571,7 @@ def removeChoirSpeedDynamics():
         speed.setParent("Forceer")
         piezoTriggered = False
    
-def pipesStageone():
+def pipesStageOne():
     addPipes()
     c = Control(pipes)
     c.addControllers("Pipe", "valve", "Forceer")
@@ -577,14 +585,34 @@ def pipesStageone():
         v.goTo(Vector((position[0]*3, position[1]*3, position[2])), speed=60, active=True, callback=pipeArrived)
         v.setParent("Forceer")
 
-    
+
+
+def pipesStageTwo():
+    print("pipes stage 2")
+    c = Control(pipes)
+    c.addControllers("Pipe", "valve", "Forceer")
+    roll = c.getControlsByType("roller")
+    def rollerDone():
+        print("################# ROLLER ARRIVED ########################")
+    for r in roll:
+        r.active = True
+        r.isDynamic = True
+        position = utils.randomPosition()
+        r.goTo(Vector((4, position[1]*3, position[2])), speed=5, active=True, callback=rollerDone)
+        #r.setParent("Forceer")
 
 # first event
 def telescopicMotors():
     addTelescopics()
-    # c = Control(telescopics)
+    c = Control(telescopics)
     # c.addControllers("Tele", "speed", "Forceer")
-    # s = c.getControlsByType("speed")
+    s = c.getControlsByType("speed")
+    for speed in s:
+        liblo.send(oneShotAddress, speed.oscurl, 0.3)
+    l = c.getControlsByType("length")
+    for length in l:
+        rLen = random()
+        liblo.send(oneShotAddress, length.oscurl, rLen)
     # for speed in s:
     #     #controller.worldPosition = [random()* 0.2 - 0.5, random(), random()]
     #     speed.active = True
