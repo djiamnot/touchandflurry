@@ -8,10 +8,10 @@ def scale (OldValue, OldMin, OldMax, NewMin, NewMax):
     NewValue = (((OldValue - OldMin) * NewRange) / OldRange) + NewMin
     return NewValue
 
-def randomPosition():
-    x = random() * 6 - 3
-    y = random() * 6 - 3
-    z = random() * 4
+def randomPosition(coeff=6):
+    x = (random() * coeff) - (coeff/2.)
+    y = (random() * coeff) - (coeff/2.)
+    z = random() * 4.
     return [x, y, z]
 
 def smooth(x):

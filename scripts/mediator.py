@@ -71,18 +71,23 @@ class Mediator(bge.types.KX_GameObject):
             return objPosition
 
     def sendPosition(self):
+        if not self.active:
+            self.visible = False
+        else:
+            self.visible = True
         if self.isDynamic and self.active:
             velocityVector = self.getLinearVelocity()
             veloSum = sum(velocityVector)
             position = self.getFloorPosition()
             #normalizedPosition = self.invert(abs(position.x)) * self.valveForce
             if 'C3' in self.oscurl:
-                normalizedPosition = self.invert(abs(position.x)) * self.forceInfluence() * 0.2
+                normalizedPosition = self.invert(abs(position.x)) * self.forceInfluence() * 0.1
             else:
                 normalizedPosition = self.invert(abs(position.x)) * self.forceInfluence()
                 self.setAlpha(normalizedPosition)
             #print("{}'s velocity: {}, normalized position: {}".format(self.oscurl, veloSum, normalizedPosition));
             if 'onoff' in self.control:
+                print("found onoff")
                 onoff = 0
                 if normalizedPosition > 0:
                     onoff = int(2)
@@ -90,6 +95,7 @@ class Mediator(bge.types.KX_GameObject):
                     onoff = 0
                 liblo.send(self.oscaddress, self.oscurl, onoff)
             else: 
+                print(" ------> ", self.oscurl, self.control, normalizedPosition)
                 liblo.send(self.oscaddress, self.oscurl, normalizedPosition)
         else:
             if 'valve' in self.control:

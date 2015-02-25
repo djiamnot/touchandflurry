@@ -432,15 +432,16 @@ def updatePositions():
     piezosAction()
     intonaData = ctl.getIntonaData()
     #print("--------------->     piezd:{} pizm:{} ir:{}".format(intonaData["piezd"], intonaData["piezm"], intonaData["ir"]))
-    ir = intonaData['ir']
+    #ir = intonaData['ir']
     #piezd = intonaData['piezd']
     #piezm = intonaData['piezm']
     #print("----> Piezos d:{:0.2f} m:{:0.2f}".format(piezd, piezm))
     # ir = utils.smooth(abs(intonaData['accel_x']))
-    print(" ---> ir", ir)
+    #print(" ---> ir", ir)
     #print(" ---> accel_x smooth", utils.smooth(ir))
     #context.scene.objects["Forceer"].worldPosition.z = ir*0.01
-    context.scene.lights["ShowerLight"].energy = utils.scale(ir*0.001,0.2, 0.8, 0.01, 0.99) 
+    #context.scene.lights["ShowerLight"].energy = utils.scale(ir*0.001,0.2, 0.8, 0.01, 1.99) 
+    #context.scene.lights["ShowerLight"].energy = 0.99 
     if piezoTriggered:
         context.scene.lights["distanceLamp"].energy = 3.5
     else:
@@ -450,7 +451,7 @@ def updatePositions():
     #posCoeff = scalingFactor * 0.001
     for collection in [pipes, choirs, telescopics]:
         if len(collection) > 0:
-            updateMediators(collection, ir)
+            updateMediators(collection, 1)
     
     # if len(controls) > 0:
     #     for i in controls:
@@ -461,41 +462,44 @@ def updatePositions():
     #         else:
     #             i.stopDynamics()
 
-timeMarkers = [1.2, 2.3, 35.2, 55.7, 62.0, 590.0, 720.0]
+timeMarkers = [1.2, 2.3, 15.2, 25.7, 32.0, 40, 90.0, 130.0, 150.0, 720.0]
 event = 0
 piezoTriggered = False
 
 def zero():
     print("================= zero")
-    telescopicMotors()
+    #telescopicMotors()
 def one():
     print("= ==== = ====== = =one")
-    telescopicMotorsControlsStop()
-    flutesAction()
+    #telescopicMotorsControlsStop()
+    addChoirs()
+    flutesValvesAction()
 def two():
     print(" = = == ======= == == ===== two")
-    telescopicValves()
+    flutesMove()
+    #telescopicValves()
 def three():
     print("======= ========= ========== {}".format(event))
-    pipesStageOne()
+    flutesMove()
 def four():
     print("======= ========= ========== {}".format(event))
-    pipesStageTwo()
+    pipesStageOne()
 def five():
     print("======= ========= ========== {}".format(event))        
-    returnAllToOrigin()
+    flutesValvesAction()
 def six():
     print("======= ========= ========== {}".format(event))
-    
+    pipesStageTwo()
 def seven():
     print("======= ========= ========== {}".format(event))
-    
+    pipesStageThree()
 def eight():
     print("======= ========= ========== {}".format(event))
-    
+    addTelescopics()
+    telescopicValves()
 def nine():
     print("======= ========= ========== {}".format(event))
-    endObjects(telescopics)
+    returnAllToOrigin()
 
 def ten():
     print("======= ========= ========== {}".format(event))
@@ -527,25 +531,55 @@ def sequence():
             if idx == event:
                 print("********** event {} *****************".format(event))
                 eventMap[idx]()
-                sectionText.text = "{}".format(event)
                 event += 1
+                sectionText.text = "{}".format(event)
 
 def piezosAction():
     global piezoTriggered
+    triggerLevel = 120
     intonaData = ctl.getIntonaData()
     piezd = intonaData['piezd']
     piezm = intonaData['piezm']
-    print("-=-=-=-=-=- > piezd:{0:0.2f} piezm:{0:0.2f}".format(piezd, piezm))
+    #print("-=-=-=-=-=- > piezd:{0:0.2f} piezm:{0:0.2f}".format(piezd, piezm))
     if event == 2:
-        if piezd > 140:
+        if piezd > triggerLevel:
             print("!!!! Piezo spike", piezd)
             if not piezoTriggered:
-                dynamicChoirSpeed()
+                flutesMove()
+                piezoTriggered = True
             else:
-                removeChoirSpeedDynamics()
+                 flutesMove()
+                 piezoTriggered = False
+    if event == 4:
+        if piezd > triggerLevel:
+            print("!!!! Piezo spike", piezd)
+            if not piezoTriggered:
+                flutesValvesAction()
+                piezoTriggered = True
+            else:
+                flutesValvesAction()
+                piezoTriggered = False
+    if event == 5:
+        if piezd > triggerLevel:
+            print("!!!! Piezo spike", piezd)
+            if not piezoTriggered:
+                groupControlMovements(pipes, "roller", position=random()*10000, speed=random()*10000)
+                piezoTriggered = True
+            else:
+                groupControlMovements(pipes, "mute", position=random()*10000, speed=random()*1000)
+                piezoTriggered = False
+    if event == 6:
+        if piezd > triggerLevel:
+            print("!!!! Piezo spike", piezd)
+            if not piezoTriggered:
+                groupControlMovements(pipes, "tirap", position=random()*1000, speed=random()*10000)
+                piezoTriggered = True
+            else:
+                groupControlMovements(pipes, "tirap", position=random()*1000, speed=random()*10000)
+                piezoTriggered = False
+
 
 def dynamicChoirSpeed():
-    global piezoTriggered
     intonaData = ctl.getIntonaData()
     accelx = intonaData['accel_x'] * 0.001
     accely = intonaData['accel_y'] * 0.001
@@ -559,7 +593,7 @@ def dynamicChoirSpeed():
         speed.removeParent()
         speed.startDynamics()
         speed.localLinearVelocity = [accelx, accely, accelz]
-        piezoTriggered = True
+
     
 def removeChoirSpeedDynamics():
     global piezoTriggered
@@ -575,32 +609,59 @@ def pipesStageOne():
     addPipes()
     c = Control(pipes)
     c.addControllers("Pipe", "valve", "Forceer")
-    valves = c.getControlsByType("valve")
-    def pipeArrived():
-        print("################# PIPE ARRIVED ########################")
-    for v in valves:
-        v.active = True
-        v.isDynamic = True
-        position = utils.randomPosition()
-        v.goTo(Vector((position[0]*3, position[1]*3, position[2])), speed=60, active=True, callback=pipeArrived)
-        v.setParent("Forceer")
+    valves = c.getControlsByType("valves")
+    mutes = c.getControlsByType("mutes")
+    rollers = c.getControlsByType("rollers")
+    vert = c.getControlsByType("Vert")
+    horiz = c.getControlsByType("Horiz")
+    setAndGoTo(valves)
+    setAndGoTo(rollers,x=1, speed=20)
+    setAndGoTo(mutes, x=-1, speed=20)
+    setAndGoTo(vert, x=1, speed=20), 
+    setAndGoTo(horiz, x=-1, speed=20)
+    stopObjects(rollers)
+    stopObjects(mutes)
+    stopObjects(vert)
+    stopObjects(horiz)
+    
+def setAndGoTo(collection, x=1, coeff=6, speed=1, end=True):
+    xpos = 100
+    for c in collection:
+        c.active = True
+        c.isDynamic = True
+        position = utils.randomPosition(coeff)
+        if abs(x) > 99:
+            xpos = position[0]
+        else:
+            xpos = x
+        c.goTo(Vector((xpos, position[1]*3, position[2])), speed, active=True, callback=None)
+        c.removeParent()
 
-
+def stopObjects(collection):
+    for c in collection:
+        c.active = False
+        c.isDynamic = False
+        c.stopDynamics()
 
 def pipesStageTwo():
     print("pipes stage 2")
     c = Control(pipes)
     c.addControllers("Pipe", "valve", "Forceer")
     roll = c.getControlsByType("roller")
-    def rollerDone():
-        print("################# ROLLER ARRIVED ########################")
-    for r in roll:
-        r.active = True
-        r.isDynamic = True
-        position = utils.randomPosition()
-        r.goTo(Vector((4, position[1]*3, position[2])), speed=5, active=True, callback=rollerDone)
-        #r.setParent("Forceer")
+    setAndGoTo(roll, x=2, speed=1)
 
+def pipesStageThree():
+    print("pipes stage 2")
+    c = Control(pipes)
+    c.addControllers("Pipe", "valve", "Forceer")
+    mute = c.getControlsByType("mute")
+    setAndGoTo(mute, x=9, speed=30)
+
+def groupControlMovements(collection, control, position=2, speed=10):
+    c = Control(collection)
+    c.addControllers("Pipe", control, "Forceer")
+    setAndGoTo(control, position, speed)
+        
 # first event
 def telescopicMotors():
     addTelescopics()
@@ -644,35 +705,25 @@ def telescopicValves():
     c = Control(telescopics)
     c.addControllers("Tele", "valve", "Forceer")
 
-def flutesAction():
-    addChoirs()
+def flutesValvesAction():
     c = Control(choirs)
-    c.addControllers("Choir", "speed", "Forceer")
-    c.addControllers("Choir", "dur", "Forceer")
-    c.addControllers("Choir", "onoff", "Forceer")
-    c.addControllers("Choir", "open", "Forceer")
-    s = c.getControlsByType("speed")
+    c.addControllers("Choir", "valve", "Forceer")
+    s = c.getControlsByType("valve")
     for speed in s:
-        speed.active = True
-        speed.isDynamic = True
-        speed.forceAffected = False
-        position = utils.randomPosition()
-        speed.goTo(Vector((position[0]*3, position[1]*3, position[2])), speed=30, active=True)
-        #speed.startDynamics()
-    d = c.getControlsByType("dur")
-    for duration in d:
-        duration.active = True
-        duration.isDynamic = True
-        duration.forceAffected = False
-        position = utils.randomPosition()
-        duration.goTo(Vector((position[0]*10+1, position[1]*10+1, position[2])), speed=10, active=True)
-    o = c.getControlsByType("onoff")
-    for pulse in o:
-        pulse.active = True
-        pulse.isDynamic = True
-        pulse.forceAffected = False
-        position = utils.randomPosition()
-        pulse.goTo(Vector((0.0, position[1], position[2])), speed=20, active=True)
+        choose = randint(0, 4)
+        if choose is 0:
+            speed.active = True
+            speed.isDynamic = True
+            speed.forceAffected = True
+            position = utils.randomPosition(6)
+            speed.goTo(Vector((position[0]*10-5, position[1]*10-5, position[2])), speed=5, active=True)
+
+def flutesMove():
+    c = Control(choirs)
+    s = c.getControlsByType("valve")
+    for valve in s:
+        position = utils.randomPosition(24)
+        valve.goTo(Vector((position[0], position[1], position[2])), speed=1, active=True)
 
 def endObjects(obj):
     [o.endObject() for o in obj]
@@ -684,7 +735,7 @@ def playRandomValve():
     rand = randint(0, len(v))
     v[rand].isActive = True
     v[rand].isDynamic = True
-    v[rand].goTo(Vector(utils.randomPosition()),speed=2, active=True)
+    v[rand].goTo(Vector(utils.randomPosition(6)),speed=2, active=True)
 
 def tubeLengths():
     vCtl = Control(telescopics)
@@ -703,7 +754,8 @@ def updateMediators(collection, ir):
 
 def handleMediator(obj, ir):
     obj.update()
-    obj.valveForce = utils.scale(ir*0.001,0.2, 0.8, 0.01, 0.99) 
+    #obj.valveForce = utils.scale(ir*0.001,0.2, 0.8, 0.01, 0.99) 
+    obj.valveForce = 1
 
 def goTocb(ctl):
     print("goto callback", ctl)
