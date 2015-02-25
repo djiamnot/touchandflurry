@@ -462,7 +462,7 @@ def updatePositions():
     #         else:
     #             i.stopDynamics()
 
-timeMarkers = [1.2, 2.3, 15.2, 25.7, 32.0, 40, 90.0, 130.0, 150.0, 720.0]
+timeMarkers = [1.2, 2.3, 105.2, 250.7, 320.0, 400, 490.0, 530.0, 590.0, 670, 720.0]
 event = 0
 piezoTriggered = False
 
@@ -484,6 +484,7 @@ def three():
 def four():
     print("======= ========= ========== {}".format(event))
     pipesStageOne()
+    pipeTiraps(vertical=1, horizontal=1)
 def five():
     print("======= ========= ========== {}".format(event))        
     flutesValvesAction()
@@ -493,10 +494,13 @@ def six():
 def seven():
     print("======= ========= ========== {}".format(event))
     pipesStageThree()
+    pipeTiraps()
 def eight():
     print("======= ========= ========== {}".format(event))
+    pipeTiraps(vertical=10, horizontal=10)
     addTelescopics()
     telescopicValves()
+    telescopicMotors(speed=0.1)
 def nine():
     print("======= ========= ========== {}".format(event))
     returnAllToOrigin()
@@ -563,6 +567,7 @@ def piezosAction():
         if piezd > triggerLevel:
             print("!!!! Piezo spike", piezd)
             if not piezoTriggered:
+                flutesMove()
                 groupControlMovements(pipes, "roller", position=random()*10000, speed=random()*10000)
                 piezoTriggered = True
             else:
@@ -572,10 +577,34 @@ def piezosAction():
         if piezd > triggerLevel:
             print("!!!! Piezo spike", piezd)
             if not piezoTriggered:
-                groupControlMovements(pipes, "tirap", position=random()*1000, speed=random()*10000)
+                flutesMove()
+                groupControlMovements(pipes, "roller", position=random()*1000, speed=random()*10000)
                 piezoTriggered = True
             else:
-                groupControlMovements(pipes, "tirap", position=random()*1000, speed=random()*10000)
+                groupControlMovements(pipes, "mute", position=random()*1000, speed=random()*10000)
+                piezoTriggered = False
+    if event == 7:
+        if piezd > triggerLevel:
+            print("!!!! Piezo spike", piezd)
+            if not piezoTriggered:
+                flutesMove()
+                groupControlMovements(pipes, "roller", position=random()*1000, speed=random()*10000)
+                piezoTriggered = True
+            else:
+                groupControlMovements(pipes, "mute", position=random()*1000, speed=random()*10000)
+                piezoTriggered = False
+
+    if event == 7:
+        if piezd > triggerLevel:
+            print("!!!! Piezo spike", piezd)
+            if not piezoTriggered:
+                flutesMove()
+                groupControlMovements(pipes, "roller", position=random()*1000, speed=random()*10000)
+                pipeTiraps(vertical=10, horizontal=10)
+                piezoTriggered = True
+            else:
+                pipeTiraps(vertical=5, horizontal=5)
+                groupControlMovements(pipes, "mute", position=random()*1000, speed=random()*10000)
                 piezoTriggered = False
 
 
@@ -657,19 +686,28 @@ def pipesStageThree():
     mute = c.getControlsByType("mute")
     setAndGoTo(mute, x=9, speed=30)
 
+def pipeTiraps(vertical=0.1, horizontal=0.1):
+    c = Control(pipes)
+    # c.addControllers("Tele", "speed", "Forceer")
+    horiz = c.getControlsByType("tirapVert")
+    for h in horiz:
+        liblo.send(oneShotAddress, h.oscurl, vertical)
+    vert = c.getControlsByType("tirapHoriz")
+    for v in vert:
+        liblo.send(oneShotAddress, v.oscurl, horizontal)
+
 def groupControlMovements(collection, control, position=2, speed=10):
     c = Control(collection)
     c.addControllers("Pipe", control, "Forceer")
     setAndGoTo(control, position, speed)
         
 # first event
-def telescopicMotors():
-    addTelescopics()
+def telescopicMotors(speed=0.3):
     c = Control(telescopics)
     # c.addControllers("Tele", "speed", "Forceer")
     s = c.getControlsByType("speed")
-    for speed in s:
-        liblo.send(oneShotAddress, speed.oscurl, 0.3)
+    for sp in s:
+        liblo.send(oneShotAddress, sp.oscurl, 0.3)
     l = c.getControlsByType("length")
     for length in l:
         rLen = random()
