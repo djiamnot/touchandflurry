@@ -95,7 +95,7 @@ class Mediator(bge.types.KX_GameObject):
                     onoff = 0
                 liblo.send(self.oscaddress, self.oscurl, onoff)
             else: 
-                print(" ------> ", self.oscurl, self.control, normalizedPosition)
+                #print(" ------> ", self.oscurl, self.control, normalizedPosition)
                 liblo.send(self.oscaddress, self.oscurl, normalizedPosition)
         else:
             if 'valve' in self.control:

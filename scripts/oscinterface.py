@@ -39,7 +39,7 @@ class OSCinterface():
 
     def lightCallback(self, path, args):
         print("light", args)
-        self.logic.globalDict['intonaData']["ir"] = args[0]*10
+        self.logic.globalDict['intonaData']["ir"] = args[0]
 
     def fallback(self, path, args):
         print ("received unknown message {0} ~ {1}".format(path, args))
