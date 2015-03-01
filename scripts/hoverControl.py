@@ -263,7 +263,7 @@ def allOut():
         for valve in v:
             valve.removeParent()
             valve.stopDynamics()
-            valve.goTo(Vector((-20, 0, 5)), speed=0.5, active=True, callback=energyZero)
+            valve.goTo(Vector((-20, 0, 5)), speed=3, active=True, callback=energyZero)
 
 def energyZero():
     global ENERGY
@@ -498,12 +498,12 @@ def one():
 def two():
     print(" = = == ======= == == ===== two")
     flutesMove()
-    energyUp(0.1)
+    energyUp(0.05)
     #telescopicValves()
 def three():
     print("======= ========= ========== {}".format(event))
     flutesMove()
-    energyUp(0.15)
+    energyUp(0.05)
 def four():
     print("======= ========= ========== {}".format(event))
     pipesStageOne()
@@ -526,7 +526,7 @@ def seven():
     pipesStageThree()
     telescopicMotors(speed=1)
     pipeTiraps()
-    energyUp(0.05)
+    energyUp(0.15)
 def eight():
     print("======= ========= ========== {}".format(event))
     pipeTiraps(vertical=0.01, horizontal=0.5)
@@ -534,7 +534,7 @@ def eight():
     energyUp(0.1)
 def nine():
     print("======= ========= ========== {}".format(event))
-    pipeTiraps(vertical=1.0, horizontal=0.5)
+    pipeTiraps(vertical=0.99, horizontal=0.5)
     allOut()
 
 def ten():
@@ -577,7 +577,7 @@ def piezosAction():
     triggerLevel = 600
     intonaData = ctl.getIntonaData()
     ir = intonaData['ir']
-    print("-=-=-=-=-=- > ir:{0:0.2f} ".format(ir))
+    #print("-=-=-=-=-=- > ir:{0:0.2f} ".format(ir))
     if event == 2:
         if ir > triggerLevel:
             print("!!!! Piezo spike", ir)
@@ -602,9 +602,11 @@ def piezosAction():
             if not irTriggered:
                 flutesMove()
                 groupControlMovements(pipes, "roller", position=random(), speed=random()*10000)
+                pipeTiraps(vertical=0.1, horizontal=random())
                 irTriggered = True
             else:
                 groupControlMovements(pipes, "mute", position=random(), speed=random()*1000)
+                pipeTiraps(vertical=0.05, horizontal=random())
                 irTriggered = False
     if event == 6:
         if ir > triggerLevel:

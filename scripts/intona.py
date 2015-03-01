@@ -13,7 +13,7 @@ from serial import Serial
 s = None
 oscinterface = OSC.OSCinterface(logic)
 try:
-    s = Serial('/dev/ttyUSB0', '57600', timeout=1)
+    s = Serial('/dev/ttyUSB0', '57600', timeout=0)
 except:
     pass
 #s.open()
@@ -49,7 +49,7 @@ def readIntona():
             }
             logic.globalDict['intonaData'] = intonaData
     else:
-        oscinterface.recv(1)
+        oscinterface.recv(0)
     #print("************", logic.globalDict['intonaData'])
     #jabDetect()
 
@@ -57,6 +57,11 @@ def makeFloat(x):
     try:
         return float(x)
     except:
+        print(" ----- > bad value", x, type(x), len(x))
+        newx = x.rstrip("\0x00")
+        print(" +++ stripped to ", newx, type(newx), len(newx))
+        newx = newx.split(' ')
+        print(" +++ and split ", newx, type(newx), len(newx))
         pass
 
 def jabDetect():
