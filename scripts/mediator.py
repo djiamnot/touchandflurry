@@ -82,6 +82,10 @@ class Mediator(bge.types.KX_GameObject):
             #normalizedPosition = self.invert(abs(position.x)) * self.valveForce
             if 'C3' in self.oscurl:
                 normalizedPosition = self.invert(abs(position.x)) * self.forceInfluence() * 0.05
+            elif 'C2' in self.oscurl:
+                normalizedPosition = self.invert(abs(position.x)) * self.forceInfluence() * 0.9
+            elif 'C1' in self.oscurl:
+                normalizedPosition = self.invert(abs(position.x)) * self.forceInfluence() * 0.9
             else:
                 normalizedPosition = self.invert(abs(position.x)) * self.forceInfluence()
                 self.setAlpha(normalizedPosition)
