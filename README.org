@@ -34,7 +34,11 @@ La rosée
 
    Touch & Flurry is a comprovisation for a pair of robotic instruments by Productions Totem Contemporain called /The Pipe/ [fn:1]. The instruments are played by an innovative controller called /Intonaspacio/ [[fig:Intonaspacio-controller][Fig. 1]] designed by Mailis Rodrigues[fn:2].
 
-
+** Requirements
+The project runs with blender >2.6 and uses python. It is best to run with a recent build (as of this writing 2.74. The project relies heavily on python. Keep in mind that blender uses python 3, some OSs may still be using python 2.7 as default. In order for it to work, you must ensure that python3 is installed and the following packages.
+- python3-liblo 
+- python3-numpy
+- python3-serial
 * Footnotes
 
 [fn:1] http://totemcontemporain.com/totem-instrument/the-pipe/
