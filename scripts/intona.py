@@ -25,6 +25,7 @@ def readIntona():
     if not s is None:
         data = s.readline()
         d = data.decode()
+        print(d)
         ch = d.split(',')
         if len(ch) < 17: # we mayhave caught stream midway, let's wait for next line
             return
@@ -52,8 +53,12 @@ def readIntona():
         oscinterface.recv(0)
     #print("************", logic.globalDict['intonaData'])
     #jabDetect()
+    
+def showType(x):
+    print(" ---------> value: ", x, type(x), len(x))
 
 def makeFloat(x):
+    showType(x)
     try:
         return float(x)
     except:
@@ -62,7 +67,8 @@ def makeFloat(x):
         print(" +++ stripped to ", newx, type(newx), len(newx))
         newx = newx.split(' ')
         print(" +++ and split ", newx, type(newx), len(newx))
-        pass
+        return float(newx)
+        
 
 def jabDetect():
     """
@@ -75,4 +81,3 @@ def jabDetect():
     else:
         logic.globalDict['intonaData']["jab"] = False
         
-
