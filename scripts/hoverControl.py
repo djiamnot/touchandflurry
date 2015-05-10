@@ -498,7 +498,7 @@ def one():
 def two():
     print(" = = == ======= == == ===== two")
     flutesMove()
-    energyUp(0.05)
+    energyUp(0.08)
     #telescopicValves()
 def three():
     print("======= ========= ========== {}".format(event))
@@ -509,11 +509,11 @@ def four():
     pipesStageOne()
     groupControlMovements(pipes, "mute", position=random(), speed=random()*10000)
     pipeTiraps(vertical=0.1, horizontal=0.1)
-    energyUp(0.15)
+    energyUp(0.1)
 def five():
     print("======= ========= ========== {}".format(event))        
     flutesValvesAction()
-    energyUp(0.2)
+    energyUp(0.1)
 def six():
     print("======= ========= ========== {}".format(event))
     pipesStageTwo()
@@ -526,7 +526,7 @@ def seven():
     pipesStageThree()
     telescopicMotors(speed=1)
     pipeTiraps()
-    energyUp(0.15)
+    energyUp(0.1)
 def eight():
     print("======= ========= ========== {}".format(event))
     pipeTiraps(vertical=0.01, horizontal=0.5)
@@ -534,7 +534,7 @@ def eight():
     energyUp(0.1)
 def nine():
     print("======= ========= ========== {}".format(event))
-    pipeTiraps(vertical=0.99, horizontal=0.5)
+    pipeTiraps(vertical=0.96, horizontal=0.5)
     allOut()
 
 def ten():
@@ -606,7 +606,7 @@ def piezosAction():
                 irTriggered = True
             else:
                 groupControlMovements(pipes, "mute", position=random(), speed=random()*1000)
-                pipeTiraps(vertical=0.05, horizontal=random())
+                pipeTiraps(vertical=0.02, horizontal=random())
                 irTriggered = False
     if event == 6:
         if ir > triggerLevel:
@@ -635,7 +635,7 @@ def piezosAction():
             if not irTriggered:
                 flutesMove()
                 groupControlMovements(pipes, "roller", position=random(), speed=random()*10000)
-                pipeTiraps(vertical=0.01, horizontal=0.01)
+                pipeTiraps(vertical=0.02, horizontal=0.01)
                 irTriggered = True
             else:
                 pipeTiraps(vertical=0.2, horizontal=0.2)
