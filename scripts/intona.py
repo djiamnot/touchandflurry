@@ -27,28 +27,36 @@ def readIntona():
         d = data.decode()
         print(d)
         ch = d.split(',')
-        if len(ch) < 17: # we mayhave caught stream midway, let's wait for next line
-            return
-        else:
-            intonaData = {
-                "roll": makeFloat(ch[1]),
-                "pitch": makeFloat(ch[2]),
-                "yaw": makeFloat(ch[3]),
-                "accel_x": makeFloat(ch[5]),
-                "accel_y": makeFloat(ch[6]),
-                "accel_z": makeFloat(ch[7]),
-                "gyro_x": makeFloat(ch[8]),
-                "gyro_y": makeFloat(ch[9]),
-                "gyro_z": makeFloat(ch[10]),
-                "magnetom_x": makeFloat(ch[11]),
-                "magnetom_y": makeFloat(ch[12]),
-                "magnetom_z": makeFloat(ch[13]),
-                "magnetom_heading": makeFloat(ch[14].split(' ')[0]),
-                "piezd": makeFloat(ch[14].split(' ')[2]),
-                "piezm": makeFloat(ch[15].split(' ')[1]),
-                "ir": makeFloat(ch[16].rstrip('\r\n').split(' ')[1])
-            }
-            logic.globalDict['intonaData'] = intonaData
+        print("rpy: {} {} {}".format(ch[1], ch[2], ch[3]))
+        intonaData = {
+            "roll": makeFloat(ch[1]),
+            "pitch": makeFloat(ch[2]),
+            "yaw": makeFloat(ch[3]),
+            "ir": makeFloat(ch[16].rstrip('\r\n').split(' ')[1])
+        }
+        # if len(ch) < 17: # we mayhave caught stream midway, let's wait for next line
+        #     return
+        # else:
+        #     intonaData = {
+        #         "roll": makeFloat(ch[1]),
+        #         "pitch": makeFloat(ch[2]),
+        #         "yaw": makeFloat(ch[3]),
+        #         "accel_x": makeFloat(ch[5]),
+        #         "accel_y": makeFloat(ch[6]),
+        #         "accel_z": makeFloat(ch[7]),
+        #         "gyro_x": makeFloat(ch[8]),
+        #         "gyro_y": makeFloat(ch[9]),
+        #         "gyro_z": makeFloat(ch[10]),
+        #         "magnetom_x": makeFloat(ch[11]),
+        #         "magnetom_y": makeFloat(ch[12]),
+        #         "magnetom_z": makeFloat(ch[13]),
+        #         "magnetom_heading": makeFloat(ch[14].split(' ')[0]),
+        #         "piezd": makeFloat(ch[14].split(' ')[2]),
+        #         "piezm": makeFloat(ch[15].split(' ')[1]),
+        #         "ir": makeFloat(ch[16].rstrip('\r\n').split(' ')[1])
+        #     }
+        logic.globalDict['intonaData'] = intonaData
+        print("intondata: {}".format(intonaData))
     else:
         oscinterface.recv(0)
     #print("************", logic.globalDict['intonaData'])
