@@ -19,6 +19,7 @@ sys.path.append(SCRIPTS_PATH)
 #print(os.path.join(logic.expandPath('//'), 'scripts'))
 import config
 import context
+import intona
 from ticker import Ticker
 from mediator import Mediator
 from control import Control
@@ -57,6 +58,14 @@ telescopics = []
 choirs = []
 
 ctl = Control(controls)
+
+def autoExec():
+    print("auto exec")
+    context.scene.pre_draw.append(preTest)
+
+def preTest():
+    #print("boo")
+    intona.readIntona()
 
 def energyUp(x=0.1):
     global ENERGY

@@ -25,7 +25,7 @@ def readIntona():
     if not s is None:
         data = s.readline()
         d = data.decode()
-        print(d)
+        print("**********>>>>>>>", d)
         ch = d.split(',')
         print("rpy: {} {} {}".format(ch[1], ch[2], ch[3]))
         intonaData = {
@@ -76,7 +76,6 @@ def makeFloat(x):
         newx = newx.split(' ')
         print(" +++ and split ", newx, type(newx), len(newx))
         return float(newx)
-        
 
 def jabDetect():
     """
