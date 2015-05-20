@@ -13,7 +13,7 @@ from serial import Serial
 s = None
 oscinterface = OSC.OSCinterface(logic)
 try:
-    s = Serial('/dev/ttyUSB0', '57600', timeout=0)
+    s = Serial('/dev/ttyUSB0', '57600', timeout=1)
 except:
     pass
 #s.open()
@@ -27,13 +27,20 @@ def readIntona():
         d = data.decode()
         print("**********>>>>>>>", d)
         ch = d.split(',')
-        print("rpy: {} {} {}".format(ch[1], ch[2], ch[3]))
-        intonaData = {
-            "roll": makeFloat(ch[1]),
-            "pitch": makeFloat(ch[2]),
-            "yaw": makeFloat(ch[3]),
-            "ir": makeFloat(ch[16].rstrip('\r\n').split(' ')[1])
-        }
+        [s.replace(" ","") for s in ch]
+        if len(ch) is 17:
+            print("rpy: {} {} {}".format(ch[1], ch[2], ch[3]))
+            try:
+                intonaData = {
+                    "roll": makeFloat(ch[1]),
+                    "pitch": makeFloat(ch[2]),
+                    "yaw": makeFloat(ch[3]),
+                    "ir": makeFloat(ch[16].rstrip('\r\n').split(' ')[1])
+                }
+                logic.globalDict['intonaData'] = intonaData
+                print("intondata: {}".format(intonaData))
+            except:
+                pass
         # if len(ch) < 17: # we mayhave caught stream midway, let's wait for next line
         #     return
         # else:
@@ -55,8 +62,7 @@ def readIntona():
         #         "piezm": makeFloat(ch[15].split(' ')[1]),
         #         "ir": makeFloat(ch[16].rstrip('\r\n').split(' ')[1])
         #     }
-        logic.globalDict['intonaData'] = intonaData
-        print("intondata: {}".format(intonaData))
+
     else:
         oscinterface.recv(0)
     #print("************", logic.globalDict['intonaData'])
@@ -66,7 +72,7 @@ def showType(x):
     print(" ---------> value: ", x, type(x), len(x))
 
 def makeFloat(x):
-    showType(x)
+    #showType(x)
     try:
         return float(x)
     except:
@@ -75,7 +81,8 @@ def makeFloat(x):
         print(" +++ stripped to ", newx, type(newx), len(newx))
         newx = newx.split(' ')
         print(" +++ and split ", newx, type(newx), len(newx))
-        return float(newx)
+        #return float(newx)
+        pass
 
 def jabDetect():
     """

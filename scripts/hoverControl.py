@@ -64,8 +64,9 @@ def autoExec():
     context.scene.pre_draw.append(preTest)
 
 def preTest():
-    #print("boo")
-    intona.readIntona()
+    print("boo")
+    #intona.readIntona()
+    #updatePositions()
 
 def energyUp(x=0.1):
     global ENERGY
