@@ -1,0 +1,35 @@
+#N canvas 1269 115 533 317 10;
+#X obj 39 115 vsl 15 128 -180 180 0 0 empty empty empty 0 -9 0 10 -262144
+-1 -1 1169 1;
+#X obj 58 115 vsl 15 128 -180 180 0 0 empty empty empty 0 -9 0 10 -262144
+-1 -1 7694 1;
+#X obj 79 115 vsl 15 128 -180 180 0 0 empty empty empty 0 -9 0 10 -262144
+-1 -1 10048 1;
+#X obj 210 112 vsl 15 128 0 1000 0 0 empty empty empty 0 -9 0 10 -262144
+-1 -1 4991 1;
+#X obj 254 112 vsl 15 128 0 1000 0 0 empty empty empty 0 -9 0 10 -262144
+-1 -1 279 1;
+#X obj 277 111 vsl 15 128 0 1000 0 0 empty empty empty 0 -9 0 10 -262144
+-1 -1 165 1;
+#X obj 37 13 OSCrx 10000;
+#X obj 37 57 unpack f f f;
+#X obj 119 58 unpack f f f;
+#X obj 37 35 OSCrouter /orientation /acc /ir /piezD /piezM;
+#X obj 116 105 vsl 15 128 -180 180 0 0 empty empty empty 0 -9 0 10
+-262144 -1 -1 0 1;
+#X obj 135 105 vsl 15 128 -180 180 0 0 empty empty empty 0 -9 0 10
+-262144 -1 -1 176 1;
+#X obj 156 105 vsl 15 128 -180 180 0 0 empty empty empty 0 -9 0 10
+-262144 -1 -1 0 1;
+#X connect 6 0 9 0;
+#X connect 7 0 0 0;
+#X connect 7 1 1 0;
+#X connect 7 2 2 0;
+#X connect 8 0 10 0;
+#X connect 8 1 11 0;
+#X connect 8 2 12 0;
+#X connect 9 0 7 0;
+#X connect 9 1 8 0;
+#X connect 9 2 3 0;
+#X connect 9 3 4 0;
+#X connect 9 4 5 0;
